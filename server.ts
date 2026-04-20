@@ -14,12 +14,13 @@ import helmet from 'helmet';
 import db from './database';
 import aiService from './ai_service';
 import cronTasks from './cron_tasks';
-import { addClient as addSSEClient, send as sendSSE } from './sse_logger';
-import { ContentType, EditorSource, Game, LanguageCode, Post, TaskStatus, User } from './types';
+import { addClient as addSSEClient } from './sse_logger';
+import { EditorSource, Game, LanguageCode, Post, User } from './types';
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'doomsgame-secret-key';
 const USE_SECURE_COOKIE = NODE_ENV === 'production';
+const useTestSessionStore = NODE_ENV === 'test';
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
@@ -106,12 +107,16 @@ app.use(express.static(path.join(PROJECT_ROOT, 'public'), { maxAge: '30d', immut
 app.use(cors({ origin: true, credentials: true }));
 
 let sessionStore: session.Store | undefined;
-try {
-  const FileStore = sessionFileStore(session);
-  sessionStore = new FileStore({ path: './sessions', retries: 1 });
-  console.log('Using session-file-store for sessions (./sessions)');
-} catch (err) {
-  console.warn('session-file-store not available; using default MemoryStore. To persist sessions across restarts install session-file-store: npm install session-file-store');
+if (!useTestSessionStore) {
+  try {
+    const FileStore = sessionFileStore(session);
+    sessionStore = new FileStore({ path: './sessions', retries: 1, reapInterval: 0 });
+    console.log('Using session-file-store for sessions (./sessions)');
+  } catch (err) {
+    console.warn('session-file-store not available; using default MemoryStore. To persist sessions across restarts install session-file-store: npm install session-file-store');
+  }
+} else {
+  console.log('Using default MemoryStore during tests');
 }
 
 app.use(session({
@@ -302,7 +307,7 @@ app.get('/admin/scraper-logs', isAdmin, (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders && res.flushHeaders();
+  if (res.flushHeaders) res.flushHeaders();
   res.write(': connected\n\n');
   addSSEClient(res as ServerResponse & { write: (chunk: string) => void });
   const ping = setInterval(() => {

@@ -6,7 +6,7 @@ import db from './database';
 import { send as sendSSE } from './sse_logger';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import type { Browser, Page, HTTPResponse } from 'puppeteer';
+import type { Browser, HTTPResponse } from 'puppeteer';
 
 puppeteer.use(StealthPlugin());
 
@@ -34,8 +34,8 @@ function slugify(text: string) {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/-{2,}/g, '-')
     .substring(0, 80);
 }
 

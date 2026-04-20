@@ -13,19 +13,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
       - name: Run lint
         run: npm run lint
+
       - name: Run audit
         run: npm run audit
+
       - name: Run tests
         run: npm test
+
       - name: Build project
         run: npm run build
-      - name: Run healthcheck
-        run: npm run healthcheck
+
+      - name: Start server & Run healthcheck
+        run: |
+          npm start &
+          echo "Waiting for server to start..."
+          # Wait for server to be ready (up to 30 seconds)
+          for i in {1..30}; do
+            if curl -s http://localhost:3000/health > /dev/null; then
+              echo "Server is up!"
+              break
+            fi
+            echo "Waiting for server ($i)..."
+            sleep 1
+            if [ $i -eq 30 ]; then
+              echo "Server failed to start in time"
+              exit 1
+            fi
+          done
+          npm run healthcheck
+        env:
+          PORT: 3000
+          NODE_ENV: production
+          JWT_SECRET: ${{ secrets.JWT_SECRET || 'test_secret' }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'test_session_secret' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'fake_key' }}
+
+

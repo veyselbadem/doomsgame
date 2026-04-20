@@ -12,25 +12,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
       - name: Build project
         run: npm run build
+
       - name: Copy artifacts to remote server
-        uses: appleboy/scp-action@v0.1.0
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_KEY }}
           port: ${{ secrets.DEPLOY_PORT || 22 }}
-          source: "package.json package-lock.json dist views public .env.example"
+          source: "package.json,package-lock.json,dist/,views/,public/,.env.example"
           target: ${{ secrets.DEPLOY_PATH }}
+
       - name: Remote deploy commands
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
@@ -38,10 +42,11 @@ jobs:
           port: ${{ secrets.DEPLOY_PORT || 22 }}
           script: |
             cd "${{ secrets.DEPLOY_PATH }}"
-            npm install --production
+            npm ci --production
             if command -v pm2 >/dev/null 2>&1; then
               pm2 stop doomsgame || true
               pm2 start dist/server.js --name doomsgame
             else
               echo "pm2 not installed on target server; please start the app manually."
             fi
+

@@ -92,11 +92,11 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
     )
   `);
 
-  db.run('ALTER TABLE games ADD COLUMN is_published INTEGER DEFAULT 0', (err) => {
+  db.run('ALTER TABLE games ADD COLUMN is_published INTEGER DEFAULT 0', () => {
     // Ignore error if column already exists
   });
 
-  db.run('ALTER TABLE posts ADD COLUMN is_published INTEGER DEFAULT 1', (err) => {
+  db.run('ALTER TABLE posts ADD COLUMN is_published INTEGER DEFAULT 1', () => {
     // Ignore error if column already exists
   });
 
@@ -118,26 +118,26 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
     )
   `);
 
-  db.get("SELECT * FROM settings WHERE key = 'autonomous_timer'", (err, row) => {
+  db.get("SELECT * FROM settings WHERE key = 'autonomous_timer'", (_err, row) => {
     if (!row) {
       db.run('INSERT INTO settings (key, value) VALUES (?, ?)', ['autonomous_timer', '0 9 * * *']);
     }
   });
 
-  db.get("SELECT * FROM settings WHERE key = 'auto_pilot_enabled'", (err, row) => {
+  db.get("SELECT * FROM settings WHERE key = 'auto_pilot_enabled'", (_err, row) => {
     if (!row) {
       db.run('INSERT INTO settings (key, value) VALUES (?, ?)', ['auto_pilot_enabled', '0']);
     }
   });
 
-  db.run('ALTER TABLE posts ADD COLUMN quality_score INTEGER DEFAULT 0', (err) => {
+  db.run('ALTER TABLE posts ADD COLUMN quality_score INTEGER DEFAULT 0', () => {
     // ignore
   });
-  db.run('ALTER TABLE games ADD COLUMN quality_score INTEGER DEFAULT 0', (err) => {
+  db.run('ALTER TABLE games ADD COLUMN quality_score INTEGER DEFAULT 0', () => {
     // ignore
   });
 
-  db.get('SELECT * FROM users WHERE username = ?', ['admin'], (err, row) => {
+  db.get('SELECT * FROM users WHERE username = ?', ['admin'], (_err, row) => {
     if (!row) {
       const hashedPassword = bcrypt.hashSync('admin123', 10);
       db.run('INSERT INTO users (username, password) VALUES (?, ?)', ['admin', hashedPassword]);
