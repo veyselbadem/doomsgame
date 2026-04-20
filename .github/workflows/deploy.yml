@@ -8,9 +8,21 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
+    environment: production
+
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Verify Secrets
+        run: |
+          ERROR=0
+          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then echo "::error::DEPLOY_HOST is missing"; ERROR=1; fi
+          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then echo "::error::DEPLOY_USER is missing"; ERROR=1; fi
+          if [ -z "${{ secrets.DEPLOY_KEY }}" ]; then echo "::error::DEPLOY_KEY is missing"; ERROR=1; fi
+          if [ -z "${{ secrets.DEPLOY_PATH }}" ]; then echo "::error::DEPLOY_PATH is missing"; ERROR=1; fi
+          if [ $ERROR -eq 1 ]; then exit 1; fi
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
