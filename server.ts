@@ -11,6 +11,8 @@ import fs from 'fs';
 import cors from 'cors';
 import compression from 'compression';
 import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+
 import db from './database';
 import aiService from './ai_service';
 import cronTasks from './cron_tasks';
@@ -105,6 +107,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(PROJECT_ROOT, 'public'), { maxAge: '30d', immutable: true }));
 app.use(cors({ origin: true, credentials: true }));
+
+// Rate Limiters
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 100, // IP başına 15 dakikada 100 istek
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Çok fazla istek gönderildi, lütfen daha sonra tekrar deneyin.' }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 saat
+  max: 10, // IP başına saatte en fazla 10 giriş denemesi
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'Çok fazla hatalı giriş denemesi yapıldı. Lütfen bir saat sonra tekrar deneyin.' }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 dakika
+  max: 20, // IP başına 15 dakikada en fazla 20 AI isteği
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, error: 'AI limitine ulaşıldı. Lütfen biraz bekleyin.' }
+});
+
+// Uygula
+app.use('/admin/login', authLimiter);
+app.use('/admin/ai/', aiLimiter);
+app.use('/search', generalLimiter);
+
 
 let sessionStore: session.Store | undefined;
 if (!useTestSessionStore) {
