@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy (FTP)
 
 on:
   push:
@@ -6,21 +6,12 @@ on:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    name: Deploy via FTP
     runs-on: ubuntu-latest
-
-
     steps:
       - uses: actions/checkout@v4
-
-      - name: Verify Secrets
-        run: |
-          ERROR=0
-          if [ -z "${{ secrets.DEPLOY_HOST }}" ]; then echo "::error::DEPLOY_HOST is missing"; ERROR=1; fi
-          if [ -z "${{ secrets.DEPLOY_USER }}" ]; then echo "::error::DEPLOY_USER is missing"; ERROR=1; fi
-          if [ -z "${{ secrets.DEPLOY_KEY }}" ]; then echo "::error::DEPLOY_KEY is missing"; ERROR=1; fi
-          if [ -z "${{ secrets.DEPLOY_PATH }}" ]; then echo "::error::DEPLOY_PATH is missing"; ERROR=1; fi
-          if [ $ERROR -eq 1 ]; then exit 1; fi
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -34,30 +25,23 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Copy artifacts to remote server
-        uses: appleboy/scp-action@v0.1.7
+      - name: 📂 Sync files via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ secrets.DEPLOY_PORT || 22 }}
-          source: "package.json,package-lock.json,dist/,views/,public/,.env.example"
-          target: ${{ secrets.DEPLOY_PATH }}
-
-      - name: Remote deploy commands
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ secrets.DEPLOY_PORT || 22 }}
-          script: |
-            cd "${{ secrets.DEPLOY_PATH }}"
-            npm ci --production
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 stop doomsgame || true
-              pm2 start dist/server.js --name doomsgame
-            else
-              echo "pm2 not installed on target server; please start the app manually."
-            fi
-
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          # Yüklenecek dosyalar ve klasörler
+          local-dir: ./
+          # Sadece çalışma zamanında gerekenleri gönderelim (Node.js hosting için)
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            src/
+            tests/
+            .gitignore
+            README.md
+            tsconfig.json
+            server.ts
+            *.ts
