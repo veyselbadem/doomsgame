@@ -1,0 +1,47 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' && secrets.DEPLOY_HOST && secrets.DEPLOY_USER && secrets.DEPLOY_KEY && secrets.DEPLOY_PATH
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm install
+      - name: Build project
+        run: npm run build
+      - name: Copy artifacts to remote server
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          source: "package.json package-lock.json dist views public .env.example"
+          target: ${{ secrets.DEPLOY_PATH }}
+      - name: Remote deploy commands
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            cd "${{ secrets.DEPLOY_PATH }}"
+            npm install --production
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 stop doomsgame || true
+              pm2 start dist/server.js --name doomsgame
+            else
+              echo "pm2 not installed on target server; please start the app manually."
+            fi

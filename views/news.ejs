@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="<%= currentLang %>">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= t('menu.news') %> - Doomsgame Haberler</title>
+    <meta name="description" content="Oyun dünyasındaki en son gelişmeleri ve AI tarafından hazırlanan haber özetlerini Doomsgame üzerinde takip edin.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="<%= t('menu.news') %> - Doomsgame Haberler">
+    <meta property="og:description" content="Oyun dünyasındaki en son gelişmeleri Doomsgame üzerinde takip edin.">
+    <meta property="og:url" content="<%= siteUrl %>/news">
+    <link rel="canonical" href="<%= siteUrl %>/news">
+    <meta name="keywords" content="oyun haberleri, oyun dünyası, doomsgame haber, oyun blog">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --accent-purple: #bb86fc;
+            --accent-cyan: #03dac6;
+            --text-main: #ffffff;
+            --text-dim: #b0b0b0;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-decoration: none;
+            color: var(--accent-purple);
+        }
+
+        .container {
+            padding: 4rem 5%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .post-card {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            transition: 0.3s;
+        }
+
+        .post-card:hover {
+            border-color: var(--accent-purple);
+            transform: scale(1.01);
+        }
+
+        .search-form {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-left: 2rem;
+        }
+
+        .search-input {
+            min-width: 220px;
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08);
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .search-button {
+            padding: 0.85rem 1.2rem;
+            border: none;
+            border-radius: 999px;
+            background: var(--accent-purple);
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .search-button:hover {
+            transform: translateY(-1px);
+            opacity: 0.95;
+        }
+
+        .post-excerpt {
+            max-height: 11rem;
+            overflow: hidden;
+            color: var(--text-dim);
+            margin-bottom: 1.25rem;
+        }
+
+        .read-more-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .read-more-link:hover {
+            text-decoration: underline;
+        }
+
+        .post-meta {
+            color: var(--accent-cyan);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-dim);
+        }
+
+        .content h2 {
+            font-size: 1.8rem;
+            color: var(--accent-purple);
+        }
+
+        .content p {
+            margin-bottom: 1.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-dim);
+            border-top: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <a href="/" class="logo">Doomsgame</a>
+        <nav>
+            <a href="/" style="color: white; text-decoration: none;">
+                <%= t('menu.home') %>
+            </a>
+            <form action="/search" method="get" class="search-form">
+                <input name="q" type="search" class="search-input" placeholder="<%= t('common.search_placeholder') %>" aria-label="<%= t('common.search_placeholder') %>">
+                <button type="submit" class="search-button"><%= t('menu.search') %></button>
+            </form>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1 style="font-size: 3rem; margin-bottom: 4rem;">
+            <%= t('menu.news') %>
+        </h1>
+
+        <% if (posts.length> 0) { %>
+            <% posts.forEach(post=> { %>
+                <article class="post-card">
+                    <div class="post-meta">
+                        <%= t('common.published_at') %>
+                        <%= new Date(post.created_at).toLocaleDateString() %>
+                    </div>
+                    <h2>
+                        <%= post.title %>
+                    </h2>
+                    <div class="post-excerpt">
+                        <%- post.content %>
+                    </div>
+                    <a href="/news/<%= post.id %>" class="read-more-link"><%= t('common.view_post') %> →</a>
+                </article>
+                <% }) %>
+                    <% } else { %>
+                        <p>
+                            <%= t('common.no_news') %>
+                        </p>
+                        <% } %>
+    </div>
+
+    <footer>
+        &copy; 2026 Doomsgame - AI Generated Content
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Paneli - Doomsgame.com</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #121212;
+            color: white;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #1e1e1e;
+            height: 100vh;
+            padding: 1rem;
+            border-right: 1px solid #333;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        h1,
+        h2 {
+            color: #bb86fc;
+        }
+
+        .card {
+            background: #1e1e1e;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border: 1px solid #333;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .overview-item {
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .overview-item strong {
+            font-size: 2rem;
+            color: #03dac6;
+        }
+
+        .admin-form-feedback {
+            margin-top: 0.75rem;
+            font-size: 0.95rem;
+            color: #03dac6;
+        }
+
+        .admin-form-feedback.error {
+            color: #cf6679;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background: #252525;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            background: #03dac6;
+            color: #121212;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #018786;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .nav-link:hover {
+            background: #333;
+        }
+
+        .logout {
+            color: #cf6679;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>Doomsgame</h2>
+        <a href="/" class="nav-link">Siteyi Görüntüle</a>
+        <a href="#" class="nav-link tab-link active" onclick="showTab('dashboard', event)">Dashboard</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('games', event)">Oyun Yönetimi</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('blog', event)">Blog Yönetimi</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('ai-assistant', event)">AI Asistan</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('drafts', event)">Onay Bekleyenler</a>
+        <div style="padding: 0.75rem; border-top: 1px solid #333; margin-top: 1rem;">
+            <label style="font-size: 0.9rem; color: #bbb;">Oto-Pilot (Yayına Al)</label>
+            <input type="checkbox" id="auto-pilot-toggle" style="width: auto;" onchange="toggleAutoPilot()">
+        </div>
+        <a href="/admin/logout" class="nav-link logout">Çıkış Yap</a>
+    </div>
+    <div class="main-content">
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content">
+            <h1>Dashboard</h1>
+            <div class="card">
+                <h2>Hoş Geldiniz</h2>
+                <p>Sol menüden yapmak istediğiniz işlemi seçebilirsiniz.</p>
+            </div>
+            <div class="card" id="admin-overview-card">
+                <h2>Genel Yönetim Özeti</h2>
+                <div class="dashboard-grid">
+                    <div class="overview-item">
+                        <strong id="overview-published-games">0</strong>
+                        <span>Yayındaki Oyunlar</span>
+                    </div>
+                    <div class="overview-item">
+                        <strong id="overview-published-posts">0</strong>
+                        <span>Yayınlanan Yazılar</span>
+                    </div>
+                    <div class="overview-item">
+                        <strong id="overview-draft-games">0</strong>
+                        <span>Onay Bekleyen Oyunlar</span>
+                    </div>
+                    <div class="overview-item">
+                        <strong id="overview-draft-posts">0</strong>
+                        <span>Onay Bekleyen Yazılar</span>
+                    </div>
+                    <div class="overview-item">
+                        <strong id="overview-feedback-count">0</strong>
+                        <span>Bekleyen Geri Bildirimler</span>
+                    </div>
+                    <div class="overview-item">
+                        <strong id="overview-source-count">0</strong>
+                        <span>Kayıtlı Kaynaklar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Otonom Görev Durumu</h2>
+                <button onclick="refreshTaskStatus(event)" style="background: #bb86fc;">Durumları Güncelle</button>
+                <button id="run-scraper-btn" onclick="runScraperNow(false, event)" style="background:#ffb86c; margin-left:0.5rem;">Otonom Döngüyü Şimdi Başlat</button>
+                <div class="tasks-status-list" style="margin-top: 1rem;">
+                    <p>Yükleniyor...</p>
+                </div>
+                <div id="sse-log-window" style="background:#000; color:#b8ffb8; font-family: monospace; padding:0.75rem; border-radius:6px; margin-top:1rem; height:220px; overflow:auto; display:none; border:1px solid #222;">
+                    <!-- Canlı Görev Logları buraya gelecek -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Games Tab -->
+        <div id="games-tab" class="tab-content" style="display: none;">
+            <h1>Oyun Yönetimi</h1>
+            <div class="card">
+                <h2>Yeni Oyun Ekle</h2>
+                <form id="game-form" onsubmit="submitGameForm(event)">
+                    <div class="form-group">
+                        <label>Oyun Başlığı</label>
+                        <input type="text" name="title" id="game-title" required placeholder="Örn: Super Mario">
+                    </div>
+                    <div class="form-group">
+                        <label>Embed Kodu (Iframe vb.)</label>
+                        <textarea name="embed_code" id="embed-code" rows="4" required placeholder="<iframe>...</iframe>"></textarea>
+                    </div>
+                    <button type="submit">Oyunu Kaydet</button>
+                    <div id="add-game-result" class="admin-form-feedback"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Blog Tab -->
+        <div id="blog-tab" class="tab-content" style="display: none;">
+            <h1>Blog Yönetimi</h1>
+            <div class="card">
+                <h2>Yeni Blog Yazısı Yaz</h2>
+                <form id="post-form" onsubmit="submitPostForm(event)">
+                    <div class="form-group">
+                        <label>Yazı Başlığı</label>
+                        <input type="text" name="title" id="post-title" required placeholder="Haftalık Oyun Tavsiyeleri">
+                    </div>
+                    <div class="form-group">
+                        <label>İçerik</label>
+                        <textarea name="content" id="post-content" rows="6" required placeholder="Yazı içeriğini buraya girin..."></textarea>
+                    </div>
+                    <button type="submit">Yazıyı Yayınla</button>
+                    <div id="add-post-result" class="admin-form-feedback"></div>
+                </form>
+            </div>
+        </div>
+
+        <!-- AI Assistant Tab -->
+        <div id="ai-assistant-tab" class="tab-content" style="display: none;">
+            <h1>AI Asistan</h1>
+
+            <div class="card">
+                <h2>Otonom Görev Durumu</h2>
+                <div class="tasks-status-list" style="background: #1e1e1e; border-radius: 4px; border: 1px solid #333;">
+                    <p style="padding: 1rem; color: #888;">Yükleniyor...</p>
+                </div>
+                <div style="display:flex; gap:0.5rem; margin-top:1rem;">
+                    <button onclick="refreshTaskStatus(event)" id="status-refresh-btn" style="background: #333;">Durumları Güncelle</button>
+                    <button id="run-scraper-btn-2" onclick="runScraperNow(true, event)" style="background:#ffb86c;">Otonom Döngüyü Şimdi Başlat</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>AI Blog Yazarı</h2>
+                <p>Bir konu başlığı girin, AI size taslak hazırlasın.</p>
+                <div class="form-group">
+                    <input type="text" id="ai-topic" placeholder="Örn: En İyi FPS Oyunları 2024">
+                </div>
+                <button onclick="generateAIDraft(event)">Taslak Oluştur</button>
+            </div>
+
+            <div class="card">
+                <h2>Otonom Görev Zamanlayıcı</h2>
+                <p>Botun her gün saat kaçta çalışacağını Cron formatında girin (Varsayılan: 0 9 * * * - Her gün 09:00).
+                </p>
+                <div class="form-group" style="display: flex; gap: 1rem;">
+                    <input type="text" id="cron-timer" placeholder="0 9 * * *">
+                    <button onclick="saveTimer()" style="background: #bb86fc;">Zamanlayıcıyı Güncelle</button>
+                </div>
+            </div>
+
+            <div id="ai-draft-container"
+                style="display: none; margin-top: 1.5rem; border-top: 1px solid #333; padding-top: 1rem;">
+                <h3>AI Taslağı</h3>
+                <div id="ai-draft-preview"
+                    style="background: #252525; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; border: 1px solid #444;">
+                </div>
+                <button onclick="saveAIDraft()" style="background: #bb86fc;">Bu Taslağı Yayınla</button>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; border-top: 1px solid #444; padding-top: 2rem;">
+                <h2>AI Oyun Bulucu & Embed Önerici</h2>
+                <p>İnternetten oyun ara ve embed kodlarını bul.</p>
+                <div class="form-group">
+                    <input type="text" id="ai-game-query" placeholder="Örn: Doom mini game embed">
+                </div>
+                <button onclick="suggestGameEmbeds(event)">Oyun ve Kod Ara</button>
+
+                <div id="ai-suggestions-container" style="display: none; margin-top: 1rem;">
+                    <h3>Önerilen Oyunlar</h3>
+                    <div id="ai-suggestions-list"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Otonom Kaynak Yönetimi (URL Listesi)</h2>
+                <p>Botun tarayacağı 10 Haber ve 10 Oyun sitesini buraya girin.</p>
+
+                <div style="display: flex; gap: 2rem;">
+                    <div style="flex: 1;">
+                        <h3>Haber Kaynakları</h3>
+                        <div id="news-url-inputs">
+                            <% for(let i=0; i<10; i++) { %>
+                                <div class="form-group">
+                                    <input type="url" class="news-url" placeholder="Haber URL <%= i+1 %>">
+                                </div>
+                                <% } %>
+                        </div>
+                    </div>
+                    <div style="flex: 1;">
+                        <h3>Oyun Portalı Kaynakları</h3>
+                        <div id="game-url-inputs">
+                            <% for(let i=0; i<10; i++) { %>
+                                <div class="form-group">
+                                    <input type="url" class="game-url" placeholder="Oyun URL <%= i+1 %>">
+                                </div>
+                                <% } %>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="saveSources()" style="background: #bb86fc; width: 100%;">Kaynakları Kaydet</button>
+            </div>
+        </div>
+
+        <!-- Drafts Tab -->
+        <div id="drafts-tab" class="tab-content" style="display: none;">
+            <h1>Onay Bekleyenler (Taslaklar)</h1>
+            <div id="drafts-container">
+                <div class="card">
+                    <h2>Bekleyen İçerikler</h2>
+                    <div id="drafts-list">Yükleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="preview-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 2rem; box-sizing: border-box;">
+        <div
+            style="background: #1e1e1e; height: 100%; display: flex; flex-direction: column; border-radius: 8px; border: 1px solid #333;">
+            <div
+                style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333;">
+                <h3 id="preview-title">Önizleme</h3>
+                <button onclick="closePreview()" style="background: #cf6679;">Kapat</button>
+            </div>
+            <div id="preview-body" style="flex: 1; padding: 1rem; overflow-y: auto; background: white; color: black;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadSources();
+            startSSE();
+            refreshTaskStatus();
+            await loadAdminOverview();
+        });
+
+        async function refreshTaskStatus() {
+            const lists = Array.from(document.querySelectorAll('.tasks-status-list'));
+            const btn = document.getElementById('status-refresh-btn');
+            if (btn) btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/task-status', {
+                    credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (response.status === 401) {
+                    lists.forEach(list => list.innerHTML = '<p style="padding: 1rem; color: #cf6679;">⚠️ Yetki Hatası: Yönetici girişi gerekli. Lütfen giriş yapın.</p>');
+                    return;
+                }
+                if (response.status === 500) {
+                    lists.forEach(list => list.innerHTML = '<p style="padding: 1rem; color: #cf6679;">⚠️ Sunucu Hatası: Görev durumu alınamadı.</p>');
+                    return;
+                }
+                if (!response.ok) {
+                    lists.forEach(list => list.innerHTML = `<p style="padding: 1rem; color: #cf6679;">⚠️ Hata: Sunucudan beklenmeyen yanıt (${response.status}).</p>`);
+                    return;
+                }
+
+                const data = await response.json();
+                if (data.success && data.tasks) {
+                    lists.forEach(list => list.innerHTML = '');
+                    data.tasks.forEach(task => {
+                        const div = document.createElement('div');
+                        div.style.padding = '0.75rem';
+                        div.style.borderBottom = '1px solid #333';
+                        div.style.display = 'flex';
+                        div.style.justifyContent = 'space-between';
+                        div.style.alignItems = 'center';
+                        div.innerHTML = `
+                            <span><strong>${task.name}</strong> <small style="color: #666;">(${task.schedule})</small></span>
+                            <span style="color: ${task.status.includes('Başarılı') || task.status.includes('Bekliyor') ? '#03dac6' : '#cf6679'}; font-weight: bold;">${task.status}</span>
+                        `;
+                        lists.forEach(list => list.appendChild(div.cloneNode(true)));
+                    });
+                } else {
+                    throw new Error('Veri formatı hatalı');
+                }
+            } catch (err) {
+                console.error('Task status fetch error:', err);
+                lists.forEach(list => list.innerHTML = '<p style="padding: 1rem; color: #cf6679;">⚠️ Bağlantı Hatası: Sunucuya erişilemedi.</p>');
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerText = 'Durumları Güncelle';
+                }
+            }
+        }
+
+        async function loadAdminOverview() {
+            const fields = {
+                publishedGames: document.getElementById('overview-published-games'),
+                publishedPosts: document.getElementById('overview-published-posts'),
+                draftGames: document.getElementById('overview-draft-games'),
+                draftPosts: document.getElementById('overview-draft-posts'),
+                pendingFeedback: document.getElementById('overview-feedback-count'),
+                sourceCount: document.getElementById('overview-source-count')
+            };
+
+            try {
+                const response = await fetch('/api/admin/overview', {
+                    credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Özet verisi alınamadı');
+                const data = await response.json();
+                if (data.success && data.overview) {
+                    Object.entries(data.overview).forEach(([key, value]) => {
+                        const el = fields[key];
+                        if (el) el.innerText = String(value);
+                    });
+                }
+            } catch (err) {
+                console.error('Overview fetch error:', err);
+            }
+        }
+
+        function showTab(tabName, event) {
+            event?.preventDefault();
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.tab-link').forEach(link => link.classList.remove('active'));
+            document.getElementById(tabName + '-tab').style.display = 'block';
+            if (event?.currentTarget instanceof HTMLElement) {
+                event.currentTarget.classList.add('active');
+            }
+            if (tabName === 'drafts') loadDrafts();
+        }
+
+        async function submitGameForm(event) {
+            event.preventDefault();
+            const resultEl = document.getElementById('add-game-result');
+            const titleInput = document.getElementById('game-title');
+            const embedInput = document.getElementById('embed-code');
+            if (!(titleInput instanceof HTMLInputElement) || !(embedInput instanceof HTMLTextAreaElement) || !resultEl) return;
+
+            resultEl.textContent = '';
+
+            const payload = {
+                title: titleInput.value.trim(),
+                embed_code: embedInput.value.trim()
+            };
+
+            try {
+                const response = await fetch('/admin/add-game', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    resultEl.textContent = data.message || 'Yeni oyun başarıyla kaydedildi.';
+                    resultEl.className = 'admin-form-feedback';
+                    titleInput.value = '';
+                    embedInput.value = '';
+                    await loadAdminOverview();
+                } else {
+                    resultEl.textContent = data.error || 'Kayıt başarısız oldu.';
+                    resultEl.className = 'admin-form-feedback error';
+                }
+            } catch (err) {
+                console.error(err);
+                resultEl.textContent = 'Sunucuya bağlanılamadı.';
+                resultEl.className = 'admin-form-feedback error';
+            }
+        }
+
+        async function submitPostForm(event) {
+            event.preventDefault();
+            const resultEl = document.getElementById('add-post-result');
+            const titleInput = document.getElementById('post-title');
+            const contentInput = document.getElementById('post-content');
+            if (!(titleInput instanceof HTMLInputElement) || !(contentInput instanceof HTMLTextAreaElement) || !resultEl) return;
+
+            resultEl.textContent = '';
+
+            const payload = {
+                title: titleInput.value.trim(),
+                content: contentInput.value.trim()
+            };
+
+            try {
+                const response = await fetch('/admin/add-post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (data.success) {
+                    resultEl.textContent = data.message || 'Yeni yazı başarıyla kaydedildi.';
+                    resultEl.className = 'admin-form-feedback';
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    await loadAdminOverview();
+                } else {
+                    resultEl.textContent = data.error || 'Kayıt başarısız oldu.';
+                    resultEl.className = 'admin-form-feedback error';
+                }
+            } catch (err) {
+                console.error(err);
+                resultEl.textContent = 'Sunucuya bağlanılamadı.';
+                resultEl.className = 'admin-form-feedback error';
+            }
+        }
+
+        // Her 30 saniyede bir otomatik güncelle
+        setInterval(() => {
+            if (document.getElementById('ai-assistant-tab').style.display !== 'none') {
+                refreshTaskStatus();
+            }
+        }, 30000);
+
+        async function generateAIDraft(event) {
+            event?.preventDefault();
+            const topicInput = document.getElementById('ai-topic');
+            if (!(topicInput instanceof HTMLInputElement)) return;
+            const topic = topicInput.value.trim();
+            if (!topic) return alert('Lütfen bir konu girin');
+
+            const btn = event?.currentTarget instanceof HTMLButtonElement ? event.currentTarget : (event?.target instanceof HTMLButtonElement ? event.target : null);
+            if (btn) {
+                btn.innerText = 'Düşünüyor...';
+                btn.disabled = true;
+            }
+
+            try {
+                const response = await fetch('/admin/ai/generate-post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('ai-draft-preview').innerHTML = data.draft;
+                    document.getElementById('ai-draft-container').style.display = 'block';
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            } catch (err) {
+                alert('İstek başarısız oldu');
+            } finally {
+                btn.innerText = 'Taslak Oluştur';
+                btn.disabled = false;
+            }
+        }
+
+        async function saveAIDraft() {
+            const titleInput = document.getElementById('ai-topic');
+            const preview = document.getElementById('ai-draft-preview');
+            if (!(titleInput instanceof HTMLInputElement) || !preview) return;
+
+            const title = titleInput.value.trim();
+            const content = preview.innerHTML.trim();
+            if (!title || !content) return alert('Başlık veya içerik eksik.');
+
+            try {
+                const response = await fetch('/admin/add-post', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Başarıyla yayınlandı!');
+                    loadAdminOverview();
+                } else {
+                    alert('Hata: ' + (data.error || 'Kayıt başarısız oldu.'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('İstek başarısız oldu');
+            }
+        }
+
+        async function suggestGameEmbeds(event) {
+            event?.preventDefault();
+            const queryInput = document.getElementById('ai-game-query');
+            if (!(queryInput instanceof HTMLInputElement)) return;
+            const query = queryInput.value.trim();
+            if (!query) return alert('Lütfen bir oyun adı girin');
+
+            const btn = event?.currentTarget instanceof HTMLButtonElement ? event.currentTarget : (event?.target instanceof HTMLButtonElement ? event.target : null);
+            if (btn) {
+                btn.innerText = 'Aranıyor...';
+                btn.disabled = true;
+            }
+
+            try {
+                const response = await fetch('/admin/ai/suggest-game', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    const list = document.getElementById('ai-suggestions-list');
+                    list.innerHTML = '';
+                    data.suggestions.forEach(s => {
+                        const div = document.createElement('div');
+                        div.className = 'card';
+                        div.style.background = '#252525';
+                        div.innerHTML = `
+                            <h4>${s.title}</h4>
+                            <p><strong>Neden Önerildi:</strong> ${s.reason}</p>
+                            <pre style="background: #000; padding: 0.5rem; overflow-x: auto;">${s.embed_code}</pre>
+                            <button onclick="copyToEmbed('${btoa(s.embed_code)}', '${s.title}')">Kodu Yukarıya Aktar</button>
+                        `;
+                        list.appendChild(div);
+                    });
+                    document.getElementById('ai-suggestions-container').style.display = 'block';
+                }
+            } catch (err) {
+                alert('İstek başarısız oldu');
+            } finally {
+                btn.innerText = 'Oyun ve Kod Ara';
+                btn.disabled = false;
+            }
+        }
+
+        async function saveSources(event) {
+            event?.preventDefault();
+            const sources = [];
+            document.querySelectorAll('.news-url').forEach(input => {
+                if (input.value) sources.push({ url: input.value, type: 'news' });
+            });
+            document.querySelectorAll('.game-url').forEach(input => {
+                if (input.value) sources.push({ url: input.value, type: 'game' });
+            });
+
+            try {
+                const response = await fetch('/admin/ai/sources', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sources })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Kaynaklar başarıyla güncellendi!');
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            } catch (err) {
+                alert('İstek başarısız oldu');
+            }
+        }
+
+        async function saveTimer(event) {
+            event?.preventDefault();
+            const timer = document.getElementById('cron-timer').value;
+            if (!timer) return alert('Lütfen bir Cron ifadesi girin');
+
+            try {
+                const response = await fetch('/admin/ai/timer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ timer })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Zamanlayıcı başarıyla güncellendi ve görev yeniden programlandı!');
+                } else {
+                    alert('Hata: ' + data.error);
+                }
+            } catch (err) {
+                alert('İstek başarısız oldu');
+            }
+        }
+
+        async function loadSources() {
+            try {
+                // Auto-Pilot Durumunu Yükle
+                const apResp = await fetch('/admin/ai/auto-pilot');
+                const apData = await apResp.json();
+                if (apData.success) {
+                    document.getElementById('auto-pilot-toggle').checked = apData.enabled;
+                }
+
+                const response = await fetch('/admin/ai/sources');
+                const data = await response.json();
+                if (data.success) {
+                    const newsInputs = document.querySelectorAll('.news-url');
+                    const gameInputs = document.querySelectorAll('.game-url');
+
+                    const newsSources = data.sources.filter(s => s.type === 'news');
+                    const gameSources = data.sources.filter(s => s.type === 'game');
+
+                    newsSources.forEach((s, i) => { if (newsInputs[i]) newsInputs[i].value = s.url; });
+                    gameSources.forEach((s, i) => { if (gameInputs[i]) gameInputs[i].value = s.url; });
+                }
+
+                // Zamanlayıcıyı da yükle
+                const timerResponse = await fetch('/admin/ai/timer');
+                const timerData = await timerResponse.json();
+                if (timerData.success) {
+                    document.getElementById('cron-timer').value = timerData.timer;
+                }
+            } catch (err) {
+                console.error('Veri yükleme hatası:', err);
+            }
+        }
+        async function toggleAutoPilot() {
+            const enabled = document.getElementById('auto-pilot-toggle').checked;
+            try {
+                await fetch('/admin/ai/auto-pilot', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ enabled })
+                });
+            } catch (err) { alert('Hata: ' + err.message); }
+        }
+
+        async function loadDrafts() {
+            const list = document.getElementById('drafts-list');
+            list.innerHTML = 'Yükleniyor...';
+            try {
+                const response = await fetch('/admin/drafts');
+                const data = await response.json();
+                if (data.success) {
+                    list.innerHTML = '';
+
+                    // Haberler
+                    data.posts.forEach(p => {
+                        const div = createDraftCard(p, 'post');
+                        list.appendChild(div);
+                    });
+
+                    // Oyunlar
+                    data.games.forEach(g => {
+                        const div = createDraftCard(g, 'game');
+                        list.appendChild(div);
+                    });
+
+                    if (data.posts.length === 0 && data.games.length === 0) {
+                        list.innerHTML = '<p>Bekleyen içerik yok.</p>';
+                    }
+                }
+            } catch (err) { list.innerHTML = 'Hata oluştu.'; }
+        }
+
+        function createDraftCard(item, type) {
+            const div = document.createElement('div');
+            div.className = 'card';
+            div.style.background = '#252525';
+            div.style.marginBottom = '1rem';
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <span style="background: ${type === 'post' ? '#bb86fc' : '#1e1e1e'}; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 10px;">
+                            ${type === 'post' ? 'Blog' : 'Oyun'}
+                        </span>
+                        <strong>${item.title}</strong>
+                        <div style="margin-top: 5px; font-size: 0.9rem; color: #aaa;">AI Puanı: <span style="color: #03dac6;">${item.quality_score}/10</span></div>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button onclick="previewDraftFromElement('content-${type}-${item.id}', '${item.title}', '${type}')" style="background: #333; color: white;">Önizle</button>
+                        <button onclick="handleDraft(${item.id}, '${type}', 'publish')" style="background: #03dac6;">Yayınla</button>
+                        <button onclick="handleDraft(${item.id}, '${type}', 'delete')" style="background: #cf6679;">Sil</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <div style="margin-bottom:0.5rem; color:#aaa; font-size:0.9rem;">AI Sohbet Kutusu (Geri bildirim veya düzeltme gönderin)</div>
+                    <textarea id="feedback-${type}-${item.id}" rows="3" style="width:100%; padding:0.5rem; background:#1e1e1e; border:1px solid #333; color:white; border-radius:6px;" placeholder="Örn: Bu embed kodu mobilde çalışmıyor, düzeltir misin?"></textarea>
+                    <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+                        <button onclick="sendFeedback(${item.id}, '${type}')" style="background:#bb86fc;">AI'ya Sor / Düzelt</button>
+                        <div id="feedback-status-${type}-${item.id}" style="color:#03dac6; align-self:center;">&nbsp;</div>
+                    </div>
+                    <div id="ai-response-${type}-${item.id}" style="margin-top:0.75rem; background:#111; padding:0.75rem; border-radius:6px; display:none; white-space:pre-wrap; color:#ddd;"></div>
+                    <pre id="content-${type}-${item.id}" style="display:none;">${btoa(unescape(encodeURIComponent(item.content || item.embed_code)))}</pre>
+                </div>
+            `;
+            return div;
+        }
+
+        function previewDraft(base64Content, title, type) {
+            const content = decodeURIComponent(escape(atob(base64Content)));
+            document.getElementById('preview-title').innerText = title;
+            const body = document.getElementById('preview-body');
+
+            if (type === 'game') {
+                // GÜVENLİK: SANDBOX uygulanmış iframe render
+                body.innerHTML = `
+                    <div style="text-align: center; color: #888; font-size: 0.8rem; margin-bottom: 10px;">Yönetici Paneli Koruması: İframe Sandbox Modunda Çalışıyor.</div>
+                    <div class="preview-iframe-container">
+                        ${content.replace('<iframe', '<iframe sandbox="allow-scripts allow-same-origin allow-popups" style="width: 100%; border:none; min-height: 500px;"')}
+                    </div>
+                `;
+            } else {
+                body.innerHTML = content;
+            }
+            document.getElementById('preview-modal').style.display = 'block';
+        }
+
+        function previewDraftFromElement(elemId, title, type) {
+            const el = document.getElementById(elemId);
+            if (!el) return alert('Önizleme içeriği bulunamadı.');
+            const base64 = el.textContent;
+            previewDraft(base64, title, type);
+        }
+
+        async function sendFeedback(id, type) {
+            const textarea = document.getElementById(`feedback-${type}-${id}`);
+            const statusEl = document.getElementById(`feedback-status-${type}-${id}`);
+            const responseEl = document.getElementById(`ai-response-${type}-${id}`);
+            if (!textarea) return;
+            const message = textarea.value.trim();
+            if (!message) return alert('Lütfen bir geri bildirim girin.');
+
+            const btn = event.target;
+            btn.disabled = true;
+            const originalText = btn.innerText;
+            btn.innerText = 'Gönderiliyor...';
+            statusEl.innerText = '';
+
+            try {
+                const res = await fetch('/admin/ai/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, type, message })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    statusEl.innerText = 'Güncellendi';
+                    responseEl.style.display = 'block';
+                    responseEl.innerText = data.updated;
+
+                    // Güncellenen içerikle önizleme kaynağını da güncelle
+                    const contentEl = document.getElementById(`content-${type}-${id}`);
+                    if (contentEl) {
+                        contentEl.textContent = btoa(unescape(encodeURIComponent(data.updated)));
+                    }
+                } else {
+                    statusEl.innerText = 'Hata: ' + (data.error || 'Bilinmeyen');
+                }
+            } catch (err) {
+                console.error('Feedback send error:', err);
+                statusEl.innerText = 'İstek başarısız.';
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        // Manually trigger the scraper via admin endpoint
+        async function runScraperNow(fromAiTab) {
+            // Ensure SSE is running so logs appear
+            startSSE();
+
+            const btn = fromAiTab ? document.getElementById('run-scraper-btn-2') : document.getElementById('run-scraper-btn');
+            const statusList = document.querySelector('.tasks-status-list');
+            if (btn) { btn.disabled = true; }
+            const originalText = btn ? btn.innerText : '';
+            if (btn) btn.innerText = 'Çalışıyor...';
+
+            // Show immediate notice
+            const notice = document.createElement('div');
+            notice.style.marginTop = '0.75rem';
+            notice.style.color = '#ffb86c';
+            notice.innerText = 'Botlar ava çıktı, lütfen bekleyin...';
+            if (statusList) statusList.prepend(notice);
+
+            try {
+                const res = await fetch('/admin/run-scraper', { method: 'POST', credentials: 'same-origin' });
+                const data = await res.json();
+                if (data && data.success) {
+                    notice.innerText = 'İşlem tamamlandı, taslakları kontrol edin.';
+                } else {
+                    notice.innerText = 'İşlem başarısız: ' + (data.error || 'Bilinmeyen hata');
+                }
+            } catch (err) {
+                console.error('Manual run error:', err);
+                if (notice) notice.innerText = 'Sunucuya erişilemedi.';
+            } finally {
+                if (btn) { btn.disabled = false; btn.innerText = originalText; }
+            }
+        }
+
+        function closePreview() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        async function handleDraft(id, type, action) {
+            const url = action === 'publish' ? '/admin/action/publish' : '/admin/action/delete';
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, type })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    loadDrafts();
+                }
+            } catch (err) { alert('İşlem başarısız.'); }
+        }
+
+        // Dashboard açılınca kaynakları yükle ve Draft linkine basılırsa listele
+
+        function copyToEmbed(base64Code, title) {
+            const code = atob(base64Code);
+            showTab('games', null);
+            const titleInput = document.querySelector('input[name="title"]');
+            const embedInput = document.querySelector('textarea[name="embed_code"]');
+            if (titleInput instanceof HTMLInputElement) titleInput.value = title;
+            if (embedInput instanceof HTMLTextAreaElement) embedInput.value = code;
+            window.scrollTo(0, 0);
+        }
+
+        // SSE client for live scraper logs
+        let _sse = null;
+        function appendLogToWindow(text) {
+            const win = document.getElementById('sse-log-window');
+            if (!win) return;
+            const line = document.createElement('div');
+            line.textContent = text;
+            win.appendChild(line);
+            win.style.display = 'block';
+            // Auto-scroll to bottom
+            win.scrollTop = win.scrollHeight;
+        }
+
+        function startSSE() {
+            if (_sse) return;
+            try {
+                _sse = new EventSource('/admin/scraper-logs', { withCredentials: true });
+            } catch (e) {
+                appendLogToWindow('SSE başlatılamadı: ' + e.message);
+                return;
+            }
+
+            _sse.onmessage = function (e) {
+                try {
+                    const obj = JSON.parse(e.data);
+                    let msg = obj.message;
+                    // If message is JSON-stringified, try to parse it for nicer display
+                    if (typeof msg === 'string' && msg.startsWith('{') && msg.endsWith('}')) {
+                        try { msg = JSON.parse(msg); } catch (ex) { }
+                    }
+                    appendLogToWindow('[' + obj.time + '] ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)));
+                } catch (err) {
+                    appendLogToWindow('Gelen SSE verisi işlenemedi: ' + e.data);
+                }
+            };
+
+            _sse.onerror = function (err) {
+                appendLogToWindow('SSE bağlantı hatası.');
+                try { _sse.close(); } catch (e) { }
+                _sse = null;
+            };
+        }
+    </script>
+
+    <style>
+        .nav-link.active {
+            background: #333;
+            border-left: 4px solid #bb86fc;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</body>
+
+</html>

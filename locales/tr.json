@@ -1,0 +1,27 @@
+{
+    "menu": {
+        "home": "Anasayfa",
+        "games": "Oyunlar",
+        "news": "Haberler",
+        "search": "Ara",
+        "admin": "Admin"
+    },
+    "hero": {
+        "title": "Doomsgame'e Hoş Geldiniz",
+        "subtitle": "En yeni ve popüler web oyunlarını keşfedin."
+    },
+    "common": {
+        "play_now": "Hemen Oyna",
+        "read_more": "Devamını Oku",
+        "published_at": "Yayınlanma:",
+        "no_games": "Henüz oyun eklenmemiş.",
+        "no_news": "Henüz haber eklenmemiş.",
+        "view_post": "Haberi Oku",
+        "search_placeholder": "Başlık veya içerikte ara...",
+        "search_no_results": "Aradığınız kriterde bir sonuç bulunamadı."
+    },
+    "game_page": {
+        "description": "Oyun Hakkında",
+        "ai_insight": "AI İçgörüsü"
+    }
+}

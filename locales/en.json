@@ -1,0 +1,27 @@
+{
+    "menu": {
+        "home": "Home",
+        "games": "Games",
+        "news": "News",
+        "search": "Search",
+        "admin": "Admin"
+    },
+    "hero": {
+        "title": "Welcome to Doomsgame",
+        "subtitle": "Discover the latest and most popular web games."
+    },
+    "common": {
+        "play_now": "Play Now",
+        "read_more": "Read More",
+        "published_at": "Published at:",
+        "no_games": "No games added yet.",
+        "no_news": "No news added yet.",
+        "view_post": "View Post",
+        "search_placeholder": "Search by title or content...",
+        "search_no_results": "No results matched your search."
+    },
+    "game_page": {
+        "description": "About the Game",
+        "ai_insight": "AI Insight"
+    }
+}
