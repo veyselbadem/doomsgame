@@ -289,6 +289,45 @@ app.get('/sitemap.xml', async (req: Request, res: Response) => {
   }
 });
 
+// SEO: Robots.txt
+app.get('/robots.txt', (req: Request, res: Response) => {
+  res.type('text/plain');
+  res.send(`User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ${SITE_URL}/sitemap.xml`);
+});
+
+// SEO: Sitemap.xml
+app.get('/sitemap.xml', async (req: Request, res: Response) => {
+  try {
+    const games = await db.allAsync<any>('SELECT id FROM games WHERE is_published = 1');
+    const posts = await db.allAsync<any>('SELECT id FROM posts WHERE is_published = 1');
+    
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    
+    // Core pages
+    const staticUrls = ['', '/news'];
+    staticUrls.forEach(url => {
+      xml += `<url><loc>${SITE_URL}${url}</loc><priority>1.0</priority></url>`;
+    });
+
+    // Games
+    games.forEach(game => {
+      xml += `<url><loc>${SITE_URL}/game/${game.id}</loc><priority>0.8</priority></url>`;
+    });
+
+    // Posts
+    posts.forEach(post => {
+      xml += `<url><loc>${SITE_URL}/news/${post.id}</loc><priority>0.7</priority></url>`;
+    });
+
+    xml += '</urlset>';
+    res.type('application/xml');
+    res.send(xml);
+  } catch (err) {
+    res.status(500).end();
+  }
+});
+
 app.get('/news/:id', async (req: Request, res: Response) => {
   try {
     const post = await db.getAsync<Post>('SELECT * FROM posts WHERE id = ? AND is_published = 1', [req.params.id]);
