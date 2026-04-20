@@ -1,426 +1,66 @@
 <!DOCTYPE html>
 <html lang="<%= currentLang %>">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doomsgame - <%= t('hero.title') %></title>
     <meta name="description" content="Doomsgame - <%= t('hero.subtitle') %>">
-    <meta name="keywords" content="oyun, web games, free games, html5 games, doomsgame">
     <meta property="og:type" content="website">
     <meta property="og:title" content="Doomsgame - <%= t('hero.title') %>">
     <meta property="og:description" content="<%= t('hero.subtitle') %>">
     <meta property="og:url" content="<%= siteUrl %>/">
     <link rel="canonical" href="<%= siteUrl %>/">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #050505;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --accent-purple: #bb86fc;
-            --accent-cyan: #03dac6;
-            --text-main: #ffffff;
-            --text-dim: #b0b0b0;
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 20% 20%, rgba(187, 134, 252, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(3, 218, 198, 0.05) 0%, transparent 40%);
-        }
-
-        header {
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            background: rgba(0, 0, 0, 0.5);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid var(--glass-border);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            text-decoration: none;
-            color: var(--accent-purple);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        nav {
-            display: flex;
-            align-items: center;
-        }
-
-        nav a {
-            color: var(--text-main);
-            text-decoration: none;
-            margin-left: 2rem;
-            font-weight: 600;
-            transition: 0.3s;
-        }
-
-        nav a:hover {
-            color: var(--accent-cyan);
-        }
-
-        .btn-admin {
-            margin-left: 1.25rem;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 36px;
-            background: var(--accent-purple);
-            color: #000;
-            border-radius: 8px;
-            text-decoration: none;
-            transition: 0.15s;
-            box-sizing: border-box;
-        }
-
-        .btn-admin:hover {
-            opacity: 0.95;
-            transform: translateY(-2px);
-        }
-
-        .admin-icon { font-size: 1.05rem; line-height: 1; }
-
-        .search-form {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-left: 2rem;
-        }
-
-        .search-input {
-            min-width: 240px;
-            padding: 0.75rem 1rem;
-            border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.08);
-            color: var(--text-main);
-            outline: none;
-        }
-
-        .search-input::placeholder {
-            color: rgba(255,255,255,0.6);
-        }
-
-        .search-button {
-            padding: 0.85rem 1.4rem;
-            border: none;
-            border-radius: 999px;
-            background: var(--accent-purple);
-            color: #000;
-            font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .search-button:hover {
-            transform: translateY(-1px);
-            opacity: 0.95;
-        }
-
-        .lang-switcher {
-            margin-left: 2rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .lang-switcher a {
-            font-size: 0.8rem;
-            padding: 4px 8px;
-            border: 1px solid var(--glass-border);
-            border-radius: 4px;
-            color: var(--text-dim);
-            text-decoration: none;
-            margin: 0;
-        }
-
-        .lang-switcher a.active {
-            background: var(--accent-purple);
-            border-color: var(--accent-purple);
-            color: #000;
-        }
-
-
-        .container {
-            padding: 2rem 5%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: var(--glass-border);
-        }
-
-        .hero-banner {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            padding: 4rem 0;
-            align-items: center;
-        }
-
-        .hero-text {
-            max-width: 700px;
-        }
-
-        .hero-title {
-            font-size: clamp(2.8rem, 4vw, 4.5rem);
-            margin: 0;
-            line-height: 1.05;
-        }
-
-        .hero-subtitle {
-            margin-top: 1rem;
-            font-size: 1.15rem;
-            color: var(--text-dim);
-            max-width: 660px;
-        }
-
-        .hero-actions {
-            margin-top: 2rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .hero-actions a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem 1.8rem;
-            border-radius: 999px;
-            text-decoration: none;
-            color: #000;
-            background: var(--accent-cyan);
-            font-weight: 700;
-            transition: transform 0.2s ease;
-        }
-
-        .hero-actions a:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
-        }
-
-        .post-card .post-excerpt {
-            max-height: 140px;
-            overflow: hidden;
-            color: var(--text-dim);
-        }
-
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .game-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(5px);
-            position: relative;
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-cyan);
-            box-shadow: 0 10px 30px rgba(3, 218, 198, 0.1);
-        }
-
-        .game-thumb {
-            height: 180px;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-dim);
-            font-size: 3rem;
-        }
-
-        .game-info {
-            padding: 1.5rem;
-        }
-
-        .game-title {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            font-weight: 700;
-        }
-
-        .btn-play {
-            display: block;
-            padding: 1rem;
-            background: var(--accent-cyan);
-            color: #000;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 800;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .btn-play:hover {
-            box-shadow: 0 0 20px rgba(3, 218, 198, 0.5);
-            transform: scale(1.02);
-        }
-
-        .posts-section {
-            margin-top: 6rem;
-        }
-
-        .post-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 2rem;
-            transition: 0.3s;
-        }
-
-        .post-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .post-card h3 {
-            color: var(--accent-purple);
-            margin-top: 0;
-            font-size: 1.5rem;
-        }
-
-        .post-meta {
-            font-size: 0.9rem;
-            color: var(--text-dim);
-            margin-bottom: 1rem;
-        }
-
-        footer {
-            padding: 4rem 5%;
-            text-align: center;
-            color: var(--text-dim);
-            border-top: 1px solid var(--glass-border);
-            margin-top: 6rem;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/main.css">
 </head>
-
 <body>
-    <header>
-        <a href="/" class="logo">Doomsgame</a>
-        <nav>
-            <a href="/">
-                <%= t('menu.home') %>
-            </a>
-            <a href="/news">
-                <%= t('menu.news') %>
-            </a>
-            <form action="/search" method="get" class="search-form">
-                <input name="q" type="search" class="search-input" placeholder="<%= t('common.search_placeholder') %>" aria-label="<%= t('common.search_placeholder') %>">
-                <button type="submit" class="search-button"><%= t('menu.search') %></button>
-            </form>
-            <div class="lang-switcher">
-                <a href="?lang=tr" class="<%= currentLang === 'tr' ? 'active' : '' %>">TR</a>
-                <a href="?lang=en" class="<%= currentLang === 'en' ? 'active' : '' %>">EN</a>
-            </div>
-            <a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>" class="btn-admin" aria-label="Admin Girişi" title="Admin Girişi">
-                <span class="admin-icon">👤</span>
-            </a>
-        </nav>
-    </header>
+    <%- include('partials/header') %>
 
     <div class="container">
         <section class="hero-banner">
-            <div class="hero-text">
-                <h1 class="hero-title"><%= t('hero.title') %></h1>
-                <p class="hero-subtitle"><%= t('hero.subtitle') %></p>
-                <div class="hero-actions">
-                    <a href="/news"><%= t('menu.news') %></a>
-                    <a href="/#games"><%= t('menu.games') %></a>
-                </div>
+            <h1 class="hero-title"><%= t('hero.title') %></h1>
+            <p class="hero-subtitle"><%= t('hero.subtitle') %></p>
+            <div class="hero-actions">
+                <a href="/news" class="btn-primary"><%= t('menu.news') %></a>
+                <a href="/#games" class="btn-outline"><%= t('menu.games') %></a>
             </div>
         </section>
-        <h2 id="games" class="section-title">
-            <%= t('menu.games') %>
-        </h2>
-        <div class="game-grid">
-            <% if (games.length> 0) { %>
-                <% games.forEach(game=> { %>
-                    <div class="game-card">
-                        <div class="game-thumb">🎮</div>
-                        <div class="game-info">
-                            <div class="game-title">
-                                <%= game.title %>
-                            </div>
-                            <a href="/game/<%= game.id %>" class="btn-play">
-                                <%= t('common.play_now') %>
-                            </a>
-                        </div>
-                    </div>
-                    <% }) %>
-                        <% } else { %>
-                            <p>
-                                <%= t('common.no_games') %>
-                            </p>
-                            <% } %>
-        </div>
 
-        <div class="posts-section">
-            <h2 class="section-title">
-                <%= t('menu.news') %>
-            </h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 2rem;">
-                <% if (posts.length> 0) { %>
-                    <% posts.forEach(post=> { %>
-                        <div class="post-card">
-                            <div class="post-meta">
-                                <%= new Date(post.created_at).toLocaleDateString() %>
-                            </div>
-                            <h3>
-                                <%= post.title %>
-                            </h3>
-                            <a href="/news" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">
-                                <%= t('common.read_more') %> →
-                            </a>
+        <section id="games">
+            <h2 class="section-title"><%= t('menu.games') %></h2>
+            <div class="game-grid">
+                <% if (games.length > 0) { %>
+                    <% games.forEach(game => { %>
+                        <div class="game-card">
+                            <span class="game-icon">🎮</span>
+                            <div class="game-title"><%= game.title %></div>
+                            <a href="/game/<%= game.id %>" class="btn-play"><%= t('common.play_now') %></a>
                         </div>
-                        <% }) %>
-                            <% } else { %>
-                                <p>
-                                    <%= t('common.no_news') %>
-                                </p>
-                                <% } %>
+                    <% }) %>
+                <% } else { %>
+                    <p><%= t('common.no_games') %></p>
+                <% } %>
             </div>
-        </div>
+        </section>
+
+        <section class="posts-section">
+            <h2 class="section-title"><%= t('menu.news') %></h2>
+            <div class="news-grid">
+                <% if (posts.length > 0) { %>
+                    <% posts.forEach(post => { %>
+                        <a href="/news/<%= post.id %>" class="news-card">
+                            <span class="news-meta"><%= new Date(post.created_at).toLocaleDateString() %></span>
+                            <h3 class="news-title"><%= post.title %></h3>
+                            <span class="news-link"><%= t('common.read_more') %> →</span>
+                        </a>
+                    <% }) %>
+                <% } else { %>
+                    <p><%= t('common.no_news') %></p>
+                <% } %>
+            </div>
+        </section>
     </div>
 
-    <footer>
-        &copy; 2026 Doomsgame.com - Powered by AI 🚀
-    </footer>
+    <%- include('partials/footer') %>
 </body>
-
 </html>

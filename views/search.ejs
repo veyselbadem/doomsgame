@@ -1,208 +1,56 @@
 <!DOCTYPE html>
 <html lang="<%= currentLang %>">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= t('menu.search') %> - Doomsgame</title>
-    <meta name="description" content="Doomsgame arama sonuçları">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="<%= t('menu.search') %> - Doomsgame">
-    <meta property="og:description" content="Doomsgame arama sonuçları">
-    <meta property="og:url" content="<%= siteUrl %>/search?q=<%= encodeURIComponent(query) %>">
-    <link rel="canonical" href="<%= siteUrl %>/search?q=<%= encodeURIComponent(query) %>">
-    <meta name="keywords" content="doomsgame search, oyun ara, haber ara">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #050505;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --accent-purple: #bb86fc;
-            --accent-cyan: #03dac6;
-            --text-main: #ffffff;
-            --text-dim: #b0b0b0;
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            font-family: 'Outfit', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-        }
-
-        header {
-            padding: 1.5rem 5%;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(0, 0, 0, 0.8);
-            border-bottom: 1px solid var(--glass-border);
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--accent-purple);
-            text-decoration: none;
-        }
-
-        .search-form {
-            display: flex;
-            align-items: center;
-            flex: 1;
-            max-width: 540px;
-            gap: 0.5rem;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 0.85rem 1rem;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text-main);
-        }
-
-        .search-button {
-            padding: 0.85rem 1.4rem;
-            border: none;
-            border-radius: 999px;
-            background: var(--accent-purple);
-            color: #000;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 5%;
-        }
-
-        .heading {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .heading h1 {
-            margin: 0;
-            font-size: clamp(2rem, 3vw, 3rem);
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .result-card {
-            background: var(--card-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 18px;
-            padding: 1.5rem;
-            transition: 0.25s;
-        }
-
-        .result-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--accent-cyan);
-        }
-
-        .result-card h2 {
-            margin-top: 0;
-            color: var(--accent-purple);
-        }
-
-        .result-card p,
-        .result-card .result-meta {
-            color: var(--text-dim);
-            margin: 0 0 1rem;
-            line-height: 1.7;
-        }
-
-        .result-link {
-            display: inline-block;
-            color: var(--accent-cyan);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        .result-link:hover {
-            text-decoration: underline;
-        }
-
-        .empty-message {
-            color: var(--text-dim);
-            font-size: 1.1rem;
-            padding: 2rem 0;
-        }
-
-        footer {
-            text-align: center;
-            color: var(--text-dim);
-            padding: 3rem 5%;
-            border-top: 1px solid var(--glass-border);
-        }
-    </style>
+    <link rel="stylesheet" href="/css/main.css">
 </head>
-
 <body>
-    <header>
-        <a href="/" class="logo">Doomsgame</a>
-        <form action="/search" method="get" class="search-form">
-            <input name="q" type="search" class="search-input" placeholder="<%= t('common.search_placeholder') %>" aria-label="<%= t('common.search_placeholder') %>" value="<%= query %>">
-            <button type="submit" class="search-button"><%= t('menu.search') %></button>
-        </form>
-    </header>
+    <%- include('partials/header') %>
 
     <div class="container">
-        <div class="heading">
-            <h1><%= t('menu.search') %> "<%= query %>"</h1>
-            <a href="/" class="result-link">Anasayfaya Dön</a>
-        </div>
+        <section>
+            <h1 class="hero-title" style="text-align: left; font-size: 2.5rem; margin-bottom: 2rem;">
+                <%= t('menu.search') %>: "<%= query %>"
+            </h1>
 
-        <% if (games.length === 0 && posts.length === 0) { %>
-            <div class="empty-message"><%= t('common.search_no_results') %></div>
-        <% } %>
+            <% if (games.length === 0 && posts.length === 0) { %>
+                <div class="info-card" style="background: var(--card-bg); padding: 3rem; text-align: center; border-radius: 20px;">
+                    <p style="color: var(--text-dim); font-size: 1.2rem;"><%= t('common.search_no_results') %></p>
+                    <a href="/" class="btn-play" style="display: inline-block; width: auto; margin-top: 1.5rem; padding: 0.8rem 2rem;">Anasayfaya Dön</a>
+                </div>
+            <% } %>
 
-        <% if (games.length > 0) { %>
-            <h2 style="color: var(--accent-purple); margin-bottom: 1rem;">Oyun Sonuçları</h2>
-            <div class="result-grid">
-                <% games.forEach(game => { %>
-                    <div class="result-card">
-                        <div class="result-meta"><%= new Date(game.created_at).toLocaleDateString() %></div>
-                        <h2><%= game.title %></h2>
-                        <a href="/game/<%= game.id %>" class="result-link"><%= t('common.play_now') %> →</a>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+            <% if (games.length > 0) { %>
+                <h2 class="section-title">Oyun Sonuçları</h2>
+                <div class="game-grid" style="margin-bottom: 4rem;">
+                    <% games.forEach(game => { %>
+                        <div class="game-card">
+                            <span class="game-icon">🎮</span>
+                            <div class="game-title"><%= game.title %></div>
+                            <a href="/game/<%= game.id %>" class="btn-play"><%= t('common.play_now') %></a>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } %>
 
-        <% if (posts.length > 0) { %>
-            <h2 style="color: var(--accent-purple); margin: 2.5rem 0 1rem;">Haber Sonuçları</h2>
-            <div class="result-grid">
-                <% posts.forEach(post => { %>
-                    <div class="result-card">
-                        <div class="result-meta"><%= new Date(post.created_at).toLocaleDateString() %></div>
-                        <h2><%= post.title %></h2>
-                        <p><%- post.content %></p>
-                        <a href="/news/<%= post.id %>" class="result-link"><%= t('common.view_post') %> →</a>
-                    </div>
-                <% }) %>
-            </div>
-        <% } %>
+            <% if (posts.length > 0) { %>
+                <h2 class="section-title">Haber Sonuçları</h2>
+                <div class="news-grid">
+                    <% posts.forEach(post => { %>
+                        <a href="/news/<%= post.id %>" class="news-card">
+                            <span class="news-meta"><%= new Date(post.created_at).toLocaleDateString() %></span>
+                            <h3 class="news-title"><%= post.title %></h3>
+                            <span class="news-link"><%= t('common.read_more') %> →</span>
+                        </a>
+                    <% }) %>
+                </div>
+            <% } %>
+        </section>
     </div>
 
-    <footer>
-        &copy; 2026 Doomsgame
-    </footer>
+    <%- include('partials/footer') %>
 </body>
-
 </html>

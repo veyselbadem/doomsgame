@@ -1,0 +1,18 @@
+<header>
+    <a href="/" class="logo">Doomsgame</a>
+    <nav>
+        <a href="/"><%= t('menu.home') %></a>
+        <a href="/news"><%= t('menu.news') %></a>
+        <form action="/search" method="get" class="search-form">
+            <input name="q" type="search" class="search-input" placeholder="<%= t('common.search_placeholder') %>" aria-label="<%= t('common.search_placeholder') %>">
+            <button type="submit" class="search-button"><%= t('menu.search') %></button>
+        </form>
+        <div class="lang-switcher">
+            <a href="?lang=tr" class="<%= currentLang === 'tr' ? 'active' : '' %>">TR</a>
+            <a href="?lang=en" class="<%= currentLang === 'en' ? 'active' : '' %>">EN</a>
+        </div>
+        <a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>" class="btn-admin" aria-label="Admin Girişi" title="Admin Girişi">
+            <span class="admin-icon">👤</span>
+        </a>
+    </nav>
+</header>
