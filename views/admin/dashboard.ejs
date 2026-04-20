@@ -65,6 +65,10 @@
                         <strong id="overview-source-count">0</strong>
                         <span>Kayıtlı Kaynaklar</span>
                     </div>
+                    <div class="overview-item" style="border-color: var(--accent-secondary);">
+                        <strong id="overview-total-views" style="color: var(--accent-secondary);">0</strong>
+                        <span>Toplam İzlenme</span>
+                    </div>
                 </div>
             </div>
             <div class="card">
@@ -302,7 +306,8 @@
                 draftGames: document.getElementById('overview-draft-games'),
                 draftPosts: document.getElementById('overview-draft-posts'),
                 pendingFeedback: document.getElementById('overview-feedback-count'),
-                sourceCount: document.getElementById('overview-source-count')
+                sourceCount: document.getElementById('overview-source-count'),
+                totalViews: document.getElementById('overview-total-views')
             };
 
             try {

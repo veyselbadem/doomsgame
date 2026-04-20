@@ -231,6 +231,10 @@ app.get('/game/:id', async (req: Request, res: Response) => {
   try {
     const game = await db.getAsync<Game>('SELECT * FROM games WHERE id = ?', [req.params.id]);
     if (!game) return res.status(404).render('404', { title: '404 - Sayfa Bulunamadı' });
+    
+    // Sayaç Artırma
+    db.run('UPDATE games SET views = views + 1 WHERE id = ?', [game.id], () => {});
+
     res.render('game', { 
       game,
       title: `${game.title} - Ücretsiz Oyna - Doomsgame`,
@@ -332,6 +336,10 @@ app.get('/news/:id', async (req: Request, res: Response) => {
   try {
     const post = await db.getAsync<Post>('SELECT * FROM posts WHERE id = ? AND is_published = 1', [req.params.id]);
     if (!post) return res.status(404).render('404', { title: '404 - Sayfa Bulunamadı' });
+
+    // Sayaç Artırma
+    db.run('UPDATE posts SET views = views + 1 WHERE id = ?', [post.id], () => {});
+
     res.render('post', { 
       post,
       title: `${post.title} - Doomsgame`,
@@ -587,6 +595,7 @@ app.get('/api/admin/overview', isAdmin, asyncHandler(async (req: Request, res: R
   const sourceCount = await db.getAsync<{ count: number }>('SELECT COUNT(*) AS count FROM editor_sources');
   const autoPilot = await db.getAsync<{ value: string }>("SELECT value FROM settings WHERE key = 'auto_pilot_enabled'");
   const timer = await db.getAsync<{ value: string }>("SELECT value FROM settings WHERE key = 'autonomous_timer'");
+  const totalViews = await db.getAsync<{ total: number }>('SELECT (SELECT IFNULL(SUM(views),0) FROM games) + (SELECT IFNULL(SUM(views),0) FROM posts) as total');
 
   res.json({
     success: true,
@@ -597,6 +606,7 @@ app.get('/api/admin/overview', isAdmin, asyncHandler(async (req: Request, res: R
       draftPosts: draftPosts?.count || 0,
       pendingFeedback: pendingFeedback?.count || 0,
       sourceCount: sourceCount?.count || 0,
+      totalViews: totalViews?.total || 0,
       autoPilot: autoPilot?.value === '1',
       timer: timer?.value || '0 9 * * *'
     }
