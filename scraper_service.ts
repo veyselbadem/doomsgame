@@ -220,20 +220,30 @@ class ScraperService {
 
           const prompt =
             `Aşağıdaki haber metnini kullanarak profesyonel, SEO uyumlu bir blog yazısı oluştur. ` +
-            `İçerik HTML formatında olsun, giriş-gelişme-sonuç yapısında yaz. ` +
+            `SADECE JSON formatında cevap ver: {"title": "...", "content": "...", "category": "...", "tags": "..."}. ` +
             `Başlık: ${article.title}\n\nİÇERİK:\n${article.content}`;
 
           sendSSE(`AI analiz başlıyor: ${article.title}`);
-          const aiDraft = await aiService.generateWithRetry(prompt);
+          const aiResponseRaw = await aiService.generateWithRetry(prompt);
+          
+          let aiData;
+          try {
+            const cleaned = aiResponseRaw.replace(/```json/g, '').replace(/```/g, '').trim();
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            aiData = jsonMatch ? JSON.parse(jsonMatch[0]) : { content: aiResponseRaw, category: 'Genel', tags: '' };
+          } catch {
+            aiData = { content: aiResponseRaw, category: 'Genel', tags: '' };
+          }
+
           sendSSE(`AI analiz tamamlandı: ${article.title}`);
 
           try {
             await db.runAsync(
-              'INSERT INTO posts (title, content, is_published, quality_score) VALUES (?, ?, ?, ?)',
-              [article.title || 'Başlıksız', aiDraft, 0, 0]
+              'INSERT INTO posts (title, content, category, tags, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?)',
+              [aiData.title || article.title || 'Başlıksız', aiData.content, aiData.category, aiData.tags, 0, 0]
             );
-            console.log(`✅ Taslak kaydedildi: "${article.title}"`);
-            sendSSE(`Taslak kaydedildi: ${article.title}`);
+            console.log(`✅ Taslak kaydedildi (Kategori: ${aiData.category}): "${aiData.title || article.title}"`);
+            sendSSE(`Taslak kaydedildi: ${aiData.title || article.title}`);
           } catch (dbErr: unknown) {
             const message = getErrorMessage(dbErr);
             console.error('❌ DB kayıt hatası:', message);

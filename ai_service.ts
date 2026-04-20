@@ -126,18 +126,29 @@ class AIService {
 
     const prompt = `
 Aşağıdaki ham metni analiz et ve KESİNLİKLE uydurma yapmadan güncel bir haber yazısı oluştur.
-TALİMATLAR:
-1. Tarih bilgisi olarak "Mart 2026" kullan.
-2. IGN Türkiye formatında, profesyonel, merak uyandıran ve akıcı bir dil kullan.
-3. Giriş metninde ne yazıyorsa ona sadık kal. Eğer metin boşsa veya okunamıyorsa 'Haber içeriği bulunamadı' cevabını ver.
-4. HTML formatında yaz (<h2>, <h3>, <p> etiketleri kullan).
-5. En az 600 kelime olsun.
+SADECE aşağıdaki JSON formatında cevap ver:
+{
+  "title": "Haber başlığı",
+  "content": "HTML formatında haber içeriği (600+ kelime, h2, h3, p etiketleri)",
+  "category": "Teknoloji, Oyun, E-Spor vb. tek kelime kategori",
+  "tags": "etiket1, etiket2, etiket3"
+}
 
-GİRİŞ METNİ:
+TARİH: Mart 2026.
+PROFİL: IGN Türkiye profesyonel dili.
+
+HAM METİN:
 ${text}
 `;
 
-    return this.generateWithRetry(prompt);
+    const response = await this.generateWithRetry(prompt);
+    try {
+      const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
+      const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+      return jsonMatch ? JSON.parse(jsonMatch[0]) : { content: response, category: 'Genel', tags: '' };
+    } catch {
+      return { content: response, category: 'Genel', tags: '' };
+    }
   }
 
   async suggestGameEmbeds(query: string) {
@@ -152,8 +163,8 @@ ${text}
     }
 
     const prompt = `
-"${query}" için web tabanlı oyunları öner. SADECE JSON ARRAY formatında cevap ver:
-[{"title": "", "reason": "", "embed_code": ""}]
+"${query}" için web tabanlı oyunları öner. SADECE aşağıdaki JSON ARRAY formatında cevap ver:
+[{"title": "Oyun Adı", "reason": "Neden önerildi", "embed_code": "html_iframe", "category": "Aksiyon, Yarış, vb.", "tags": "tag1, tag2"}]
 `;
     try {
       const text = await this.generateWithRetry(prompt);

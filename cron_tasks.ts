@@ -134,10 +134,10 @@ class CronTasks {
               }
 
               const healingPrompt = `
-                                Bu oyunun kalitesini 1-10 arası puanla ve mobilde taşıyorsa %100 responsive yap.
-                                Kod: ${verified.code}
-                                SADECE JSON: {"healedCode": "...", "score": 9}
-                            `;
+                                 Bu oyunun kalitesini 1-10 arası puanla ve mobilde taşıyorsa %100 responsive yap.
+                                 SADECE JSON: {"healedCode": "...", "score": 9, "category": "Aksiyon", "tags": "macera, platform"}
+                                 Kod: ${verified.code}
+                             `;
               const healedRaw = await aiService.generateWithRetry(healingPrompt);
               const healedData = JSON.parse(healedRaw.replace(/```json/g, '').replace(/```/g, '').trim());
 
@@ -147,9 +147,11 @@ class CronTasks {
                 console.log(`🚀 OTO-PİLOT: Oyun yayına alındı (${healedData.score} puan).`);
               }
 
-              await db.runAsync('INSERT INTO games (title, embed_code, is_published, quality_score) VALUES (?, ?, ?, ?)', [
+              await db.runAsync('INSERT INTO games (title, embed_code, category, tags, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?)', [
                 verified.title,
                 healedData.healedCode || verified.code,
+                healedData.category || 'Genel',
+                healedData.tags || '',
                 publishStatus,
                 healedData.score || 0
               ]);

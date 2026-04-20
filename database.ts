@@ -58,6 +58,8 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       embed_code TEXT,
+      category TEXT,
+      tags TEXT,
       is_published INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -68,6 +70,8 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       content TEXT,
+      category TEXT,
+      tags TEXT,
       is_published INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -136,6 +140,11 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
   db.run('ALTER TABLE games ADD COLUMN quality_score INTEGER DEFAULT 0', () => {
     // ignore
   });
+
+  db.run('ALTER TABLE games ADD COLUMN category TEXT', () => {});
+  db.run('ALTER TABLE games ADD COLUMN tags TEXT', () => {});
+  db.run('ALTER TABLE posts ADD COLUMN category TEXT', () => {});
+  db.run('ALTER TABLE posts ADD COLUMN tags TEXT', () => {});
 
   db.get('SELECT * FROM users WHERE username = ?', ['admin'], (_err, row) => {
     if (!row) {

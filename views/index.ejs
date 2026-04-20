@@ -33,6 +33,9 @@
                     <% games.forEach(game => { %>
                         <div class="game-card">
                             <span class="game-icon">🎮</span>
+                            <% if (game.category) { %>
+                                <div class="badge-category"><%= game.category %></div>
+                            <% } %>
                             <div class="game-title"><%= game.title %></div>
                             <a href="/game/<%= game.id %>" class="btn-play"><%= t('common.play_now') %></a>
                         </div>
@@ -49,6 +52,9 @@
                 <% if (posts.length > 0) { %>
                     <% posts.forEach(post => { %>
                         <a href="/news/<%= post.id %>" class="news-card">
+                            <% if (post.category) { %>
+                                <div class="badge-category" style="margin-bottom: 1rem;"><%= post.category %></div>
+                            <% } %>
                             <span class="news-meta"><%= new Date(post.created_at).toLocaleDateString() %></span>
                             <h3 class="news-title"><%= post.title %></h3>
                             <span class="news-link"><%= t('common.read_more') %> →</span>
