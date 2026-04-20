@@ -143,7 +143,7 @@ let sessionStore: session.Store | undefined;
 if (!useTestSessionStore) {
   try {
     const FileStore = sessionFileStore(session);
-    sessionStore = new FileStore({ path: './sessions', retries: 1, reapInterval: 0 });
+    sessionStore = new FileStore({ path: './sessions', retries: 1, reapInterval: 3600, logFn: () => {} });
     console.log('Using session-file-store for sessions (./sessions)');
   } catch (err) {
     console.warn('session-file-store not available; using default MemoryStore. To persist sessions across restarts install session-file-store: npm install session-file-store');
