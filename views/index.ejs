@@ -1,5 +1,19 @@
 <%- include('partials/header') %>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "url": "<%= siteUrl %>/",
+  "name": "Doomsgame",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "<%= siteUrl %>/search?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
     <div class="container">
         <section class="hero-banner">
             <h1 class="hero-title"><%= t('hero.title') %></h1>

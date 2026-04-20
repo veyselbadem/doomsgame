@@ -1,5 +1,28 @@
 <%- include('partials/header') %>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  "headline": "<%= post.title %>",
+  "image": ["<%= (post.image_path) ? siteUrl + '/uploads/posts/' + post.image_path : siteUrl + '/img/default-news.jpg' %>"],
+  "datePublished": "<%= new Date(post.created_at).toISOString() %>",
+  "dateModified": "<%= new Date(post.created_at).toISOString() %>",
+  "author": {
+    "@type": "Person",
+    "name": "Doomsgame AI"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Doomsgame",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "<%= siteUrl %>/img/logo.png"
+    }
+  }
+}
+</script>
+
     <style>
         .article-container { max-width: 900px; margin: 4rem auto; padding: 0 5%; }
         .article-meta { color: var(--accent-secondary); font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.9rem; }

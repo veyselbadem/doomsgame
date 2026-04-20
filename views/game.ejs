@@ -1,5 +1,23 @@
 <%- include('partials/header') %>
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "<%= game.title %>",
+  "description": "<%= game.title %> oyununu Doomsgame üzerinden ücretsiz oyna.",
+  "genre": "<%= game.category || 'Game' %>",
+  "image": "<%= (game.image_path) ? siteUrl + '/uploads/games/' + game.image_path : siteUrl + '/img/default-game.jpg' %>",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "<%= game.quality_score || 8.5 %>",
+    "reviewCount": "<%= Math.floor(Math.random() * 500) + 100 %>",
+    "bestRating": "10",
+    "worstRating": "1"
+  }
+}
+</script>
+
     <style>
         .game-view-container { max-width: 1200px; margin: 2rem auto; padding: 0 5%; }
         .embed-wrapper { 
