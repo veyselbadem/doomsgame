@@ -1,3 +1,35 @@
+<!DOCTYPE html>
+<html lang="<%= (typeof currentLang !== 'undefined') ? currentLang : 'tr' %>">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <% 
+        const metaTitle = (typeof title !== 'undefined') ? title : 'Doomsgame - AI Powered Game & Tech Hub';
+        const metaDesc = (typeof description !== 'undefined') ? description : 'Oyun dünyasındaki en son gelişmeleri ve ücretsiz oyunları AI gücüyle keşfedin.';
+        const metaImage = (typeof ogImage !== 'undefined') ? ogImage : '/img/default-cover.jpg';
+    %>
+
+    <title><%= metaTitle %></title>
+    <meta name="description" content="<%= metaDesc %>">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= siteUrl %><%= (typeof currentPath !== 'undefined') ? currentPath : '' %>">
+    <meta property="og:title" content="<%= metaTitle %>">
+    <meta property="og:description" content="<%= metaDesc %>">
+    <meta property="og:image" content="<%= metaImage %>">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="<%= metaTitle %>">
+    <meta property="twitter:description" content="<%= metaDesc %>">
+    <meta property="twitter:image" content="<%= metaImage %>">
+
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
 <header>
     <a href="/" class="logo">Doomsgame</a>
     <nav>

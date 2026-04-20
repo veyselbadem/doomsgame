@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="<%= currentLang %>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= game.title %> - Doomsgame</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
+<%- include('partials/header') %>
+
     <style>
         .game-view-container { max-width: 1200px; margin: 2rem auto; padding: 0 5%; }
         .embed-wrapper { 
@@ -19,13 +13,14 @@
         .ai-note { border-left: 4px solid var(--accent-secondary); padding-left: 1.5rem; font-style: italic; color: var(--text-dim); }
         @media (max-width: 768px) { .game-info-grid { grid-template-columns: 1fr; } }
     </style>
-</head>
-<body>
-    <%- include('partials/header') %>
 
     <div class="game-view-container">
         <h1 class="hero-title" style="text-align: left; font-size: 2.5rem; margin-bottom: 2rem;"><%= game.title %></h1>
         
+        <% if (game.category) { %>
+            <div class="badge-category" style="margin-bottom: 1.5rem;"><%= game.category %></div>
+        <% } %>
+
         <div class="embed-wrapper">
             <%- game.embed_code %>
         </div>
@@ -44,6 +39,6 @@
         </div>
     </div>
 
-    <%- include('partials/footer') %>
+<%- include('partials/footer') %>
 </body>
 </html>

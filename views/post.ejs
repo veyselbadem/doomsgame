@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="<%= currentLang %>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= post.title %> - Doomsgame</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
+<%- include('partials/header') %>
+
     <style>
         .article-container { max-width: 900px; margin: 4rem auto; padding: 0 5%; }
         .article-meta { color: var(--accent-secondary); font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.9rem; }
@@ -29,13 +23,15 @@
 
         .back-btn { display: inline-flex; margin-top: 3rem; color: var(--accent-secondary); text-decoration: none; font-weight: 700; gap: 0.5rem; transition: 0.3s; }
         .back-btn:hover { transform: translateX(-5px); }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
-</head>
-<body>
-    <%- include('partials/header') %>
 
     <div class="article-container">
         <article>
+            <% if (post.category) { %>
+                <div class="badge-category" style="margin-bottom: 1rem;"><%= post.category %></div>
+            <% } %>
             <span class="article-meta"><%= t('common.published_at') %>: <%= new Date(post.created_at).toLocaleDateString() %></span>
             <h1 class="article-title"><%= post.title %></h1>
 
@@ -75,12 +71,7 @@
             <a href="/news" class="back-btn">← <%= t('menu.news') %></a>
         </article>
     </div>
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
 
-    <%- include('partials/footer') %>
+<%- include('partials/footer') %>
 </body>
 </html>

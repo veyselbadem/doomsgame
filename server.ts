@@ -215,7 +215,12 @@ app.get('/', async (req: Request, res: Response) => {
   try {
     const games = await db.allAsync<Game>('SELECT * FROM games ORDER BY created_at DESC');
     const posts = await db.allAsync<Post>('SELECT * FROM posts WHERE is_published = 1 ORDER BY created_at DESC LIMIT 3');
-    res.render('index', { games, posts });
+    res.render('index', { 
+      games, 
+      posts,
+      title: 'Doomsgame - AI Destekli Oyun ve Haber Platformu',
+      description: 'En yeni oyun haberleri ve ücretsiz tarayıcı oyunlarını keşfedin.'
+    });
   } catch (err) {
     console.error(getErrorMessage(err));
     res.status(500).render('500', { title: '500 - Sunucu Hatası' });
@@ -226,7 +231,11 @@ app.get('/game/:id', async (req: Request, res: Response) => {
   try {
     const game = await db.getAsync<Game>('SELECT * FROM games WHERE id = ?', [req.params.id]);
     if (!game) return res.status(404).render('404', { title: '404 - Sayfa Bulunamadı' });
-    res.render('game', { game });
+    res.render('game', { 
+      game,
+      title: `${game.title} - Ücretsiz Oyna - Doomsgame`,
+      description: `${game.title} oyununu ücretsiz ve tarayıcı üzerinden hemen oyna.`
+    });
   } catch (err) {
     console.error(getErrorMessage(err));
     res.status(500).render('500', { title: '500 - Sunucu Hatası' });
@@ -236,7 +245,11 @@ app.get('/game/:id', async (req: Request, res: Response) => {
 app.get('/news', async (req: Request, res: Response) => {
   try {
     const posts = await db.allAsync<Post>('SELECT * FROM posts WHERE is_published = 1 ORDER BY created_at DESC');
-    res.render('news', { posts });
+    res.render('news', { 
+      posts,
+      title: 'Oyun Haberleri - Doomsgame',
+      description: 'Yapay zeka tarafından hazırlanan en güncel teknoloji ve oyun haberleri.'
+    });
   } catch (err) {
     console.error(getErrorMessage(err));
     res.status(500).render('500', { title: '500 - Sunucu Hatası' });
@@ -280,7 +293,11 @@ app.get('/news/:id', async (req: Request, res: Response) => {
   try {
     const post = await db.getAsync<Post>('SELECT * FROM posts WHERE id = ? AND is_published = 1', [req.params.id]);
     if (!post) return res.status(404).render('404', { title: '404 - Sayfa Bulunamadı' });
-    res.render('post', { post });
+    res.render('post', { 
+      post,
+      title: `${post.title} - Doomsgame`,
+      description: post.title
+    });
   } catch (err) {
     console.error(getErrorMessage(err));
     res.status(500).render('500', { title: '500 - Sunucu Hatası' });

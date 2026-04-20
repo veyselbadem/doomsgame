@@ -1,20 +1,4 @@
-<!DOCTYPE html>
-<html lang="<%= currentLang %>">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doomsgame - <%= t('hero.title') %></title>
-    <meta name="description" content="Doomsgame - <%= t('hero.subtitle') %>">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Doomsgame - <%= t('hero.title') %>">
-    <meta property="og:description" content="<%= t('hero.subtitle') %>">
-    <meta property="og:url" content="<%= siteUrl %>/">
-    <link rel="canonical" href="<%= siteUrl %>/">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/main.css">
-</head>
-<body>
-    <%- include('partials/header') %>
+<%- include('partials/header') %>
 
     <div class="container">
         <section class="hero-banner">
@@ -67,6 +51,6 @@
         </section>
     </div>
 
-    <%- include('partials/footer') %>
+<%- include('partials/footer') %>
 </body>
 </html>
