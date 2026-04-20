@@ -5,140 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Paneli - Doomsgame.com</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #121212;
-            color: white;
-            margin: 0;
-            display: flex;
-        }
-
-        .sidebar {
-            width: 250px;
-            background: #1e1e1e;
-            height: 100vh;
-            padding: 1rem;
-            border-right: 1px solid #333;
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-        }
-
-        h1,
-        h2 {
-            color: #bb86fc;
-        }
-
-        .card {
-            background: #1e1e1e;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            border: 1px solid #333;
-        }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-        }
-
-        .overview-item {
-            background: #252525;
-            border: 1px solid #333;
-            border-radius: 8px;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .overview-item strong {
-            font-size: 2rem;
-            color: #03dac6;
-        }
-
-        .admin-form-feedback {
-            margin-top: 0.75rem;
-            font-size: 0.95rem;
-            color: #03dac6;
-        }
-
-        .admin-form-feedback.error {
-            color: #cf6679;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        input,
-        textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border-radius: 4px;
-            border: 1px solid #333;
-            background: #252525;
-            color: white;
-            box-sizing: border-box;
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 4px;
-            background: #03dac6;
-            color: #121212;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #018786;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 0.75rem;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-        }
-
-        .nav-link:hover {
-            background: #333;
-        }
-
-        .logout {
-            color: #cf6679;
-            margin-top: 2rem;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/admin.css">
 </head>
 
 <body>
     <div class="sidebar">
-        <h2>Doomsgame</h2>
-        <a href="/" class="nav-link">Siteyi Görüntüle</a>
-        <a href="#" class="nav-link tab-link active" onclick="showTab('dashboard', event)">Dashboard</a>
-        <a href="#" class="nav-link tab-link" onclick="showTab('games', event)">Oyun Yönetimi</a>
-        <a href="#" class="nav-link tab-link" onclick="showTab('blog', event)">Blog Yönetimi</a>
-        <a href="#" class="nav-link tab-link" onclick="showTab('ai-assistant', event)">AI Asistan</a>
-        <a href="#" class="nav-link tab-link" onclick="showTab('drafts', event)">Onay Bekleyenler</a>
-        <div style="padding: 0.75rem; border-top: 1px solid #333; margin-top: 1rem;">
-            <label style="font-size: 0.9rem; color: #bbb;">Oto-Pilot (Yayına Al)</label>
-            <input type="checkbox" id="auto-pilot-toggle" style="width: auto;" onchange="toggleAutoPilot()">
+        <h2>DOOMS DATA</h2>
+        
+        <a href="/" class="nav-link"><span>🏠</span> Siteyi Gör</a>
+        <a href="#" class="nav-link tab-link active" onclick="showTab('dashboard', event)"><span>📊</span> Dashboard</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('games', event)"><span>🎮</span> Oyun Kontrol</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('blog', event)"><span>✍️</span> Blog Yazarı</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('ai-assistant', event)"><span>🤖</span> AI Asistan</a>
+        <a href="#" class="nav-link tab-link" onclick="showTab('drafts', event)"><span>⌛</span> Taslaklar</a>
+        
+        <div style="padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: 12px; margin-top: 1rem;">
+            <label style="font-size: 0.8rem; color: var(--text-dim); display: block; margin-bottom: 0.5rem; text-transform: uppercase;">AI Otonom Mod</label>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="ap-label" style="font-size: 0.9rem; font-weight: 600;">Bekliyor...</span>
+                <input type="checkbox" id="auto-pilot-toggle" style="width: auto; scale: 1.5;" onchange="toggleAutoPilot()">
+            </div>
         </div>
-        <a href="/admin/logout" class="nav-link logout">Çıkış Yap</a>
+
+        <a href="/admin/logout" class="nav-link logout"><span>🚪</span> Güvenli Çıkış</a>
     </div>
     <div class="main-content">
         <!-- Dashboard Tab -->
