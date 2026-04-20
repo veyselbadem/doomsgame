@@ -2,11 +2,11 @@ name: Deploy
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main' && secrets.DEPLOY_HOST && secrets.DEPLOY_USER && secrets.DEPLOY_KEY && secrets.DEPLOY_PATH
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
 
     steps:
