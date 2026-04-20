@@ -10,9 +10,23 @@
         .article-container { max-width: 900px; margin: 4rem auto; padding: 0 5%; }
         .article-meta { color: var(--accent-secondary); font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.9rem; }
         .article-title { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 2rem; line-height: 1.1; }
+        
+        .tldr-box { background: rgba(3, 218, 198, 0.05); border: 1px solid rgba(3, 218, 198, 0.2); border-radius: 16px; padding: 1.5rem; margin-bottom: 3rem; }
+        .tldr-title { display: flex; align-items: center; gap: 0.5rem; color: var(--accent-secondary); font-weight: 800; margin-bottom: 1rem; text-transform: uppercase; font-size: 0.9rem; }
+        .tldr-list { margin: 0; padding-left: 1.2rem; color: var(--text-main); }
+        .tldr-list li { margin-bottom: 0.5rem; }
+
         .article-content { font-size: 1.15rem; line-height: 1.9; color: var(--text-dim); }
         .article-content h2, .article-content h3 { color: var(--text-main); margin: 2rem 0 1rem; }
         .article-content p { margin-bottom: 1.5rem; }
+
+        .insight-box { margin-top: 4rem; background: var(--card-bg); border: 1px solid var(--accent-primary); border-radius: 20px; padding: 2.5rem; position: relative; overflow: hidden; }
+        .insight-box::before { content: 'AI'; position: absolute; right: -10px; top: -10px; font-size: 5rem; font-weight: 900; opacity: 0.05; color: var(--accent-primary); }
+        .insight-title { color: var(--accent-primary); font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem; }
+        
+        .youtube-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: #ff0000; color: #fff; padding: 0.8rem 1.5rem; border-radius: 99px; text-decoration: none; font-weight: 700; margin-top: 1.5rem; transition: 0.3s; }
+        .youtube-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+
         .back-btn { display: inline-flex; margin-top: 3rem; color: var(--accent-secondary); text-decoration: none; font-weight: 700; gap: 0.5rem; transition: 0.3s; }
         .back-btn:hover { transform: translateX(-5px); }
     </style>
@@ -24,12 +38,48 @@
         <article>
             <span class="article-meta"><%= t('common.published_at') %>: <%= new Date(post.created_at).toLocaleDateString() %></span>
             <h1 class="article-title"><%= post.title %></h1>
+
+            <% if (post.summary) { 
+                try {
+                    const tldr = JSON.parse(post.summary);
+                    if (tldr && tldr.length > 0) { %>
+                    <div class="tldr-box">
+                        <div class="tldr-title">
+                            <span style="animation: pulse 2s infinite;">⚡</span> Özet (TL;DR)
+                        </div>
+                        <ul class="tldr-list">
+                            <% tldr.forEach(item => { %>
+                                <li><%= item %></li>
+                            <% }) %>
+                        </ul>
+                    </div>
+                <% } } catch(e) {} } %>
+
             <div class="article-content">
                 <%- post.content %>
             </div>
+
+            <% if (post.insight) { %>
+                <div class="insight-box">
+                    <div class="insight-title">🧠 Yapay Zeka Analizi</div>
+                    <p style="color: var(--text-dim); line-height: 1.7; font-style: italic;">"<%= post.insight %>"</p>
+                    
+                    <% if (post.youtube_query) { %>
+                        <a href="https://www.youtube.com/results?search_query=<%= encodeURIComponent(post.youtube_query) %>" target="_blank" class="youtube-btn">
+                            <span>▶</span> YouTube'da İlgili Videoları Gör
+                        </a>
+                    <% } %>
+                </div>
+            <% } %>
+
             <a href="/news" class="back-btn">← <%= t('menu.news') %></a>
         </article>
     </div>
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
 
     <%- include('partials/footer') %>
 </body>

@@ -239,10 +239,20 @@ class ScraperService {
 
           try {
             await db.runAsync(
-              'INSERT INTO posts (title, content, category, tags, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?)',
-              [aiData.title || article.title || 'Başlıksız', aiData.content, aiData.category, aiData.tags, 0, 0]
+              'INSERT INTO posts (title, content, category, tags, summary, insight, youtube_query, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              [
+                aiData.title || article.title || 'Başlıksız', 
+                aiData.content, 
+                aiData.category, 
+                aiData.tags, 
+                JSON.stringify(aiData.summary || []), 
+                aiData.insight || '', 
+                aiData.youtube_query || '', 
+                0, 
+                0
+              ]
             );
-            console.log(`✅ Taslak kaydedildi (Kategori: ${aiData.category}): "${aiData.title || article.title}"`);
+            console.log(`✅ Zenginleştirilmiş taslak kaydedildi: "${aiData.title || article.title}"`);
             sendSSE(`Taslak kaydedildi: ${aiData.title || article.title}`);
           } catch (dbErr: unknown) {
             const message = getErrorMessage(dbErr);

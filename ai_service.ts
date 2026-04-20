@@ -129,13 +129,17 @@ Aşağıdaki ham metni analiz et ve KESİNLİKLE uydurma yapmadan güncel bir ha
 SADECE aşağıdaki JSON formatında cevap ver:
 {
   "title": "Haber başlığı",
-  "content": "HTML formatında haber içeriği (600+ kelime, h2, h3, p etiketleri)",
-  "category": "Teknoloji, Oyun, E-Spor vb. tek kelime kategori",
-  "tags": "etiket1, etiket2, etiket3"
+  "content": "HTML formatında ana haber içeriği",
+  "summary": ["madde 1", "madde 2", "madde 3"],
+  "insight": "Yapay zekanın bu konudaki özel yorumu ve analizi",
+  "category": "Teknoloji",
+  "tags": "etiket1, etiket2",
+  "youtube_query": "konuyla ilgili youtube arama terimi"
 }
 
 TARİH: Mart 2026.
-PROFİL: IGN Türkiye profesyonel dili.
+PROFİL: IGN Türkiye profesyonel dili. 
+NOT: 'summary' alanı haberin en önemli 3 noktasını içeren bir dizi (array) olmalıdır.
 
 HAM METİN:
 ${text}
@@ -145,9 +149,10 @@ ${text}
     try {
       const cleaned = response.replace(/```json/g, '').replace(/```/g, '').trim();
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
-      return jsonMatch ? JSON.parse(jsonMatch[0]) : { content: response, category: 'Genel', tags: '' };
+      const defaultData = { content: response, category: 'Genel', tags: '', summary: [], insight: '', youtube_query: '' };
+      return jsonMatch ? JSON.parse(jsonMatch[0]) : defaultData;
     } catch {
-      return { content: response, category: 'Genel', tags: '' };
+      return { content: response, category: 'Genel', tags: '', summary: [], insight: '', youtube_query: '' };
     }
   }
 
