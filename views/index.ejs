@@ -16,12 +16,19 @@
                 <% if (games.length > 0) { %>
                     <% games.forEach(game => { %>
                         <div class="game-card">
-                            <span class="game-icon">🎮</span>
+                            <div class="game-thumb" style="height: 180px; overflow: hidden; background: #000;">
+                                <img src="/uploads/games/<%= game.image_path %>" 
+                                     alt="<%= game.title %>" 
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     onerror="this.src='/img/default-game.jpg'">
+                            </div>
                             <% if (game.category) { %>
-                                <div class="badge-category"><%= game.category %></div>
+                                <div class="badge-category" style="position: absolute; top: 1rem; left: 1rem;"><%= game.category %></div>
                             <% } %>
-                            <div class="game-title"><%= game.title %></div>
-                            <a href="/game/<%= game.id %>" class="btn-play"><%= t('common.play_now') %></a>
+                            <div class="game-title" style="padding: 1.5rem 1.5rem 0.5rem;"><%= game.title %></div>
+                            <div style="padding: 0 1.5rem 1.5rem;">
+                                <a href="/game/<%= game.id %>" class="btn-play"><%= t('common.play_now') %></a>
+                            </div>
                         </div>
                     <% }) %>
                 <% } else { %>
@@ -36,6 +43,12 @@
                 <% if (posts.length > 0) { %>
                     <% posts.forEach(post => { %>
                         <a href="/news/<%= post.id %>" class="news-card">
+                            <div style="height: 200px; overflow: hidden; border-radius: 12px; margin-bottom: 1.5rem; background: #1a1a1a;">
+                                <img src="/uploads/posts/<%= post.image_path %>" 
+                                     alt="<%= post.title %>" 
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     onerror="this.src='/img/default-news.jpg'">
+                            </div>
                             <% if (post.category) { %>
                                 <div class="badge-category" style="margin-bottom: 1rem;"><%= post.category %></div>
                             <% } %>

@@ -74,12 +74,14 @@ async function downloadImage(imageUrl: string | null, title: string) {
       }
     });
 
-    await new Promise<void>((resolve, reject) => {
+    await new Promise<string>((resolve, reject) => {
       const writer = fs.createWriteStream(savePath);
       response.data.pipe(writer);
-      writer.on('finish', resolve);
+      writer.on('finish', () => resolve(filename));
       writer.on('error', reject);
     });
+
+    return filename;
 
     console.log(`🖼️  Görsel kaydedildi: ${filename}`);
     return `/uploads/games/${filename}`;
@@ -239,7 +241,7 @@ class ScraperService {
 
           try {
             await db.runAsync(
-              'INSERT INTO posts (title, content, category, tags, summary, insight, youtube_query, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              'INSERT INTO posts (title, content, category, tags, summary, insight, youtube_query, image_path, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
               [
                 aiData.title || article.title || 'Başlıksız', 
                 aiData.content, 
@@ -248,6 +250,7 @@ class ScraperService {
                 JSON.stringify(aiData.summary || []), 
                 aiData.insight || '', 
                 aiData.youtube_query || '', 
+                imagePath,
                 0, 
                 0
               ]

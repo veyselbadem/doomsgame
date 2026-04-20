@@ -60,6 +60,7 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
       embed_code TEXT,
       category TEXT,
       tags TEXT,
+      image_path TEXT,
       is_published INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -75,6 +76,7 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
       summary TEXT,
       insight TEXT,
       youtube_query TEXT,
+      image_path TEXT,
       is_published INTEGER DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
@@ -151,6 +153,8 @@ const db = new sqlite3Verbose.Database(dbPath) as PromisifiedDatabase;
   db.run('ALTER TABLE posts ADD COLUMN summary TEXT', () => {});
   db.run('ALTER TABLE posts ADD COLUMN insight TEXT', () => {});
   db.run('ALTER TABLE posts ADD COLUMN youtube_query TEXT', () => {});
+  db.run('ALTER TABLE games ADD COLUMN image_path TEXT', () => {});
+  db.run('ALTER TABLE posts ADD COLUMN image_path TEXT', () => {});
 
   db.get('SELECT * FROM users WHERE username = ?', ['admin'], (_err, row) => {
     if (!row) {

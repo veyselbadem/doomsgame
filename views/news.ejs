@@ -7,21 +7,28 @@
             <div class="news-grid" style="grid-template-columns: 1fr;">
                 <% if (posts.length > 0) { %>
                     <% posts.forEach(post => { %>
-                        <article class="news-card" style="margin-bottom: 2rem; display: block;">
-                            <% if (post.category) { %>
-                                <div class="badge-category" style="margin-bottom: 1rem;"><%= post.category %></div>
-                            <% } %>
-                            <span class="news-meta">
-                                <%= t('common.published_at') %>: <%= new Date(post.created_at).toLocaleDateString() %>
-                            </span>
-                            <h2 class="news-title" style="font-size: 2rem;"><%= post.title %></h2>
-                            <div style="color: var(--text-dim); margin-bottom: 1.5rem; max-height: 100px; overflow: hidden; position: relative;">
-                                <%- post.content %>
-                                <div style="position: absolute; bottom: 0; left: 0; width: 100%; height: 50px; background: linear-gradient(transparent, var(--bg-color));"></div>
+                        <article class="news-card" style="margin-bottom: 3rem; display: grid; grid-template-columns: 300px 1fr; gap: 2rem; align-items: start;">
+                            <div style="height: 200px; overflow: hidden; border-radius: 16px; background: #1a1a1a;">
+                                <img src="/uploads/posts/<%= post.image_path %>" 
+                                     alt="<%= post.title %>" 
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     onerror="this.src='/img/default-news.jpg'">
                             </div>
-                            <a href="/news/<%= post.id %>" class="btn-play" style="display: inline-block; width: auto; padding: 0.8rem 2rem;">
-                                <%= t('common.view_post') %> →
-                            </a>
+                            <div>
+                                <% if (post.category) { %>
+                                    <div class="badge-category" style="margin-bottom: 1rem;"><%= post.category %></div>
+                                <% } %>
+                                <span class="news-meta">
+                                    <%= t('common.published_at') %>: <%= new Date(post.created_at).toLocaleDateString() %>
+                                </span>
+                                <h2 class="news-title" style="font-size: 2rem; margin-bottom: 1rem;"><%= post.title %></h2>
+                                <div style="color: var(--text-dim); margin-bottom: 1.5rem; max-height: 80px; overflow: hidden; position: relative;">
+                                    <%- post.content %>
+                                </div>
+                                <a href="/news/<%= post.id %>" class="btn-play" style="display: inline-block; width: auto; padding: 0.8rem 2rem;">
+                                    <%= t('common.view_post') %> →
+                                </a>
+                            </div>
                         </article>
                     <% }) %>
                 <% } else { %>

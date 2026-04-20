@@ -147,11 +147,12 @@ class CronTasks {
                 console.log(`🚀 OTO-PİLOT: Oyun yayına alındı (${healedData.score} puan).`);
               }
 
-              await db.runAsync('INSERT INTO games (title, embed_code, category, tags, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?)', [
+              await db.runAsync('INSERT INTO games (title, embed_code, category, tags, image_path, is_published, quality_score) VALUES (?, ?, ?, ?, ?, ?, ?)', [
                 verified.title,
                 healedData.healedCode || verified.code,
                 healedData.category || 'Genel',
                 healedData.tags || '',
+                imagePath,
                 publishStatus,
                 healedData.score || 0
               ]);
