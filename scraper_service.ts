@@ -55,7 +55,14 @@ async function downloadImage(imageUrl: string | null, title: string) {
 
     const slug = slugify(title);
     const filename = `${slug}-${Date.now()}${finalExt}`;
-    const savePath = path.join(PROJECT_ROOT, 'public', 'uploads', 'games', filename);
+    const uploadDir = path.join(PROJECT_ROOT, 'public', 'uploads', 'games');
+    
+    // Klasörün varlığını garanti et
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    
+    const savePath = path.join(uploadDir, filename);
 
     const response = await axios.get(imageUrl, {
       responseType: 'stream',

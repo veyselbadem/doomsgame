@@ -684,14 +684,34 @@ app.get('/admin/logout', (req: Request, res: Response) => {
   });
 });
 
+// 404 Handler - Her zaman en sonda olmalı
 app.use((req: Request, res: Response) => {
-  res.status(404).render('404', { title: '404 - Sayfa Bulunamadı' });
+  res.status(404).render('404', { 
+    title: res.locals.t('error.404_title') || '404 - Sayfa Bulunamadı',
+    message: res.locals.t('error.404_message') || 'Aradığınız sayfa kaldırılmış veya hiç var olmamış olabilir.'
+  });
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).render('500', { title: '500 - Sunucu Hatası' });
+// Global Central Error Handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('🔥 GLOBAL ERROR:', err.stack);
+  
+  const status = err.status || 500;
+  res.status(status);
+
+  if (acceptsJson(req)) {
+    return res.json({ 
+      success: false, 
+      error: NODE_ENV === 'production' ? 'Sunucu tarafında bir hata oluştu.' : err.message 
+    });
+  }
+
+  res.render('500', { 
+    title: '500 - Sunucu Hatası',
+    error: NODE_ENV === 'production' ? null : err.stack
+  });
 });
+
 
 const PORT = process.env.PORT || 3000;
 if (require.main === module) {
